@@ -18,11 +18,11 @@ class Environment {
 
   // Supabase
   static String get supabaseUrl {
-    return 'https://ghpwbyyzwnfezokjqida.supabase.co';
+    return '';
   }
 
   static String get supabaseAnonKey {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdocHdieXl6d25mZXpva2pxaWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1NjE2MzUsImV4cCI6MjA1OTEzNzYzNX0.3MHKF75qCfH-VHJPteK96AtWGwUARPwYxT-Bn_IE8t0';
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3cWdweWNqcmhzZWFsa3JncmpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwOTkyMzAsImV4cCI6MjA2MDY3NTIzMH0.4WUUqp0CRLN--CmT0tZ-T0aZOukLa1J_s85Uqz1T3QE';
   }
 
   // Mapbox (para mapas)
