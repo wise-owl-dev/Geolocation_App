@@ -1,44 +1,32 @@
 // lib/features/auth/presentation/screens/signup_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/error/error_handler.dart';
 import '../../../shared/widgets/widgets.dart';
-import '../providers/signup_form_provider.dart';
-import '../providers/auth_provider.dart';
 
-
-class SignUpScreen extends ConsumerStatefulWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends ConsumerState<SignUpScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  
+  // Valores del formulario
+  String name = '';
+  String lastName = '';
+  String maternalLastName = '';
+  String email = '';
+  String password = '';
+  String confirmPassword = '';
+  String phone = '';
+  bool isFormPosted = false;
+  bool isPosting = false;
 
   @override
   Widget build(BuildContext context) {
-    final signUpForm = ref.watch(signUpFormProvider);
-    
-    // Escuchar cambios en el estado de autenticación
-    ref.listen(authProvider, (previous, current) {
-      if (current.isAuthenticated && previous?.isAuthenticated != true) {
-        // Si se autentica correctamente después del registro, navegar a la pantalla principal
-        context.go('/home');
-        
-        // Mostrar mensaje de éxito
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registro exitoso.'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    });
-    
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -72,30 +60,39 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               CustomTextFormField(
                 label: 'Nombre',
                 hint: 'Ingrese su nombre',
-                onChanged: ref.read(signUpFormProvider.notifier).onNameChanged,
-                errorMessage: signUpForm.isFormPosted ?
-                    signUpForm.name.errorMessage 
-                    : null,
+                onChanged: (value) {
+                  setState(() {
+                    name = value;
+                  });
+                },
+                errorMessage: isFormPosted && name.isEmpty ? 
+                    'El nombre es obligatorio' : null,
               ),
               const SizedBox(height: 16),
               // Campo de apellido paterno
               CustomTextFormField(
                 label: 'Apellido Paterno',
                 hint: 'Ingrese su apellido paterno',
-                onChanged: ref.read(signUpFormProvider.notifier).onLastNameChanged,
-                errorMessage: signUpForm.isFormPosted ?
-                    signUpForm.lastName.errorMessage 
-                    : null,
+                onChanged: (value) {
+                  setState(() {
+                    lastName = value;
+                  });
+                },
+                errorMessage: isFormPosted && lastName.isEmpty ? 
+                    'El apellido paterno es obligatorio' : null,
               ),
               const SizedBox(height: 16),
               // Campo de apellido materno
               CustomTextFormField(
                 label: 'Apellido Materno',
                 hint: 'Ingrese su apellido materno',
-                onChanged: ref.read(signUpFormProvider.notifier).onMaternalLastNameChanged,
-                errorMessage: signUpForm.isFormPosted ?
-                    signUpForm.maternalLastName.errorMessage 
-                    : null,
+                onChanged: (value) {
+                  setState(() {
+                    maternalLastName = value;
+                  });
+                },
+                errorMessage: isFormPosted && maternalLastName.isEmpty ? 
+                    'El apellido materno es obligatorio' : null,
               ),
               const SizedBox(height: 16),
               // Campo de email
@@ -103,10 +100,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 label: 'Email',
                 hint: 'correo@ejemplo.com',
                 keyboardType: TextInputType.emailAddress,
-                onChanged: ref.read(signUpFormProvider.notifier).onEmailChange,
-                errorMessage: signUpForm.isFormPosted ?
-                      signUpForm.email.errorMessage 
-                      : null,
+                onChanged: (value) {
+                  setState(() {
+                    email = value;
+                  });
+                },
+                errorMessage: isFormPosted && (email.isEmpty || !email.contains('@')) ? 
+                    'Ingrese un email válido' : null,
               ),
               const SizedBox(height: 16),
               // Campo de contraseña
@@ -117,10 +117,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     label: 'Contraseña',
                     hint: '********',
                     obscureText: _obscurePassword,
-                    onChanged: ref.read(signUpFormProvider.notifier).onPasswordChanged,
-                    errorMessage: signUpForm.isFormPosted ?
-                        signUpForm.password.errorMessage 
-                        : null, 
+                    onChanged: (value) {
+                      setState(() {
+                        password = value;
+                      });
+                    },
+                    errorMessage: isFormPosted && password.length < 6 ? 
+                        'La contraseña debe tener al menos 6 caracteres' : null, 
                   ),
                     
                   // Posicionar el botón para mostrar/ocultar contraseña
@@ -161,11 +164,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     label: 'Confirmar Contraseña',
                     hint: '********',
                     obscureText: _obscureConfirmPassword,
-                    onChanged: ref.read(signUpFormProvider.notifier).onConfirmPasswordChanged,
-                    errorMessage: signUpForm.isFormPosted ?
-                        (signUpForm.confirmPassword.errorMessage ?? 
-                        (!signUpForm.passwordsMatch ? 'Las contraseñas no coinciden' : null))
-                        : null, 
+                    onChanged: (value) {
+                      setState(() {
+                        confirmPassword = value;
+                      });
+                    },
+                    errorMessage: isFormPosted ? 
+                        (confirmPassword.isEmpty ? 'Este campo es obligatorio' : 
+                        (password != confirmPassword ? 'Las contraseñas no coinciden' : null)) : null, 
                   ),
                     
                   // Posicionar el botón para mostrar/ocultar contraseña
@@ -191,26 +197,57 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 label: 'Teléfono',
                 hint: 'Ingrese su número de teléfono',
                 keyboardType: TextInputType.phone,
-                onChanged: ref.read(signUpFormProvider.notifier).onPhoneChanged,
-                errorMessage: signUpForm.isFormPosted ?
-                    signUpForm.phone.errorMessage 
-                    : null,
+                onChanged: (value) {
+                  setState(() {
+                    phone = value;
+                  });
+                },
+                errorMessage: isFormPosted && phone.isEmpty ? 
+                    'El teléfono es obligatorio' : null,
               ),
               const SizedBox(height: 32),
               // Botón de registro
               CustomFilledButton(
-                text: signUpForm.isPosting ? 'Registrando...' : 'Registrarse',
-                isLoading: signUpForm.isPosting,
-                onPressed: signUpForm.isPosting 
+                text: isPosting ? 'Registrando...' : 'Registrarse',
+                isLoading: isPosting,
+                onPressed: isPosting 
                   ? null 
-                  : () async {
-                      try {
-                        await ref.read(signUpFormProvider.notifier).onFormSubmit();
-                      } catch (e) {
-                        // Usar el servicio mejorado de manejo de errores para mostrar mensajes amigables
-                        if (mounted) {
-                          ErrorHandler.showAuthErrorSnackBar(context, e);
-                        }
+                  : () {
+                      setState(() {
+                        isFormPosted = true;
+                      });
+                      
+                      // Validar el formulario
+                      if (name.isNotEmpty && 
+                          lastName.isNotEmpty && 
+                          maternalLastName.isNotEmpty &&
+                          email.isNotEmpty && email.contains('@') &&
+                          password.length >= 6 &&
+                          password == confirmPassword &&
+                          phone.isNotEmpty) {
+                        
+                        // Aquí iría la lógica de registro
+                        setState(() {
+                          isPosting = true;
+                        });
+                        
+                        // Simulamos un registro exitoso después de un breve retraso
+                        Future.delayed(const Duration(seconds: 2), () {
+                          setState(() {
+                            isPosting = false;
+                          });
+                          
+                          // Navegar a la pantalla principal
+                          context.go('/home');
+                          
+                          // Mostrar mensaje de éxito
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Registro exitoso.'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        });
                       }
                     },
               ),
