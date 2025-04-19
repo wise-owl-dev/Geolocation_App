@@ -1,26 +1,13 @@
 // lib/features/auth/presentation/screens/login_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/error/error_handler.dart';
 import '../../../shared/widgets/widgets.dart';
-import '../providers/login_form_provider.dart';
-import '../providers/auth_provider.dart';
 
-
-class LoginScreen extends ConsumerWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Escuchar cambios en el estado de autenticación
-    ref.listen(authProvider, (previous, current) {
-      if (current.isAuthenticated && previous?.isAuthenticated != true) {
-        // Si se autentica correctamente, navegar a la pantalla principal
-        context.go('/home');
-      }
-    });
-
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -39,21 +26,24 @@ class LoginScreen extends ConsumerWidget {
   }
 }
 
-class _LoginForm extends ConsumerStatefulWidget {
+class _LoginForm extends StatefulWidget {
   const _LoginForm({Key? key}) : super(key: key);
 
   @override
   _LoginFormState createState() => _LoginFormState();
 }
 
-class _LoginFormState extends ConsumerState<_LoginForm> {
+class _LoginFormState extends State<_LoginForm> {
   bool _obscurePassword = true;
+  
+  // Valores del formulario
+  String email = '';
+  String password = '';
+  bool isFormPosted = false;
+  bool isPosting = false;
   
   @override
   Widget build(BuildContext context) {
-    // Usar el provider de formulario con Formz
-    final loginForm = ref.watch(loginFormProvider);
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -64,9 +54,13 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
           label: 'Email',
           hint: 'correo@ejemplo.com',
           keyboardType: TextInputType.emailAddress,
-          onChanged: ref.read(loginFormProvider.notifier).onEmailChange,
-          errorMessage: loginForm.isFormPosted ?
-                loginForm.email.errorMessage 
+          onChanged: (value) {
+            setState(() {
+              email = value;
+            });
+          },
+          errorMessage: isFormPosted && (email.isEmpty || !email.contains('@')) ?
+                'Ingrese un email válido' 
                 : null,
         ),
     
@@ -80,9 +74,13 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
               label: 'Contraseña',
               hint: '********',
               obscureText: _obscurePassword,
-              onChanged: ref.read(loginFormProvider.notifier).onPasswordChanged,
-              errorMessage: loginForm.isFormPosted ?
-                  loginForm.password.errorMessage 
+              onChanged: (value) {
+                setState(() {
+                  password = value;
+                });
+              },
+              errorMessage: isFormPosted && password.isEmpty ?
+                  'La contraseña es obligatoria' 
                   : null, 
             ),
               
@@ -106,21 +104,35 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
         _buildForgotPasswordLink(),
 
         const SizedBox(height: 24),
-       CustomFilledButton(
-        text: loginForm.isPosting ? 'Iniciando sesión...' : 'Iniciar Sesión',
-        isLoading: loginForm.isPosting,
-        onPressed: loginForm.isPosting 
-          ? null 
-          : () async {
-              try {
-                await ref.read(loginFormProvider.notifier).onFormSubmit();
-              } catch (e) {
-                if (mounted) {
-                  ErrorHandler.showAuthErrorSnackBar(context, e);
+        CustomFilledButton(
+          text: isPosting ? 'Iniciando sesión...' : 'Iniciar Sesión',
+          isLoading: isPosting,
+          onPressed: isPosting 
+            ? null 
+            : () {
+                setState(() {
+                  isFormPosted = true;
+                });
+                
+                // Validar el formulario
+                if (email.isNotEmpty && email.contains('@') && password.isNotEmpty) {
+                  // Aquí iría la lógica de inicio de sesión
+                  setState(() {
+                    isPosting = true;
+                  });
+                  
+                  // Simulamos un inicio de sesión exitoso después de un breve retraso
+                  Future.delayed(const Duration(seconds: 2), () {
+                    setState(() {
+                      isPosting = false;
+                    });
+                    
+                    // Navegar a la pantalla principal
+                    context.go('/home');
+                  });
                 }
-              }
-            },
-      ),
+              },
+        ),
 
         const SizedBox(height: 24),
         _buildOrDivider(),
@@ -221,7 +233,7 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
       ),
       child: OutlinedButton.icon(
         onPressed: () {
-          // Esta funcionalidad necesitaría ser implementada en AuthService
+          // Esta funcionalidad necesitaría ser implementada
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Funcionalidad no implementada'))
           );
