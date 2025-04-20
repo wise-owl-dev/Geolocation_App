@@ -28,7 +28,7 @@ class SplashScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(10.0),
                   child: Image.asset(
-                    'assets/splash_image.png', // Cambia a un asset local
+                    'assets/images/splash_image.png', // Cambia a un asset local
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
