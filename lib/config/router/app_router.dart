@@ -1,12 +1,12 @@
 import 'package:go_router/go_router.dart';
 import 'package:maps/features/auth/auth.dart';
 import 'package:maps/features/menu/menu.dart';
-import 'package:maps/features/splash/splash.dart';
+import '../../features/shared/shared.dart';
 
 
 
 final appRouter = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: '/loading',
   routes: [
 
     ///* Auth Routes
@@ -23,6 +23,12 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/splash',
       builder: (context, state) => const SplashScreen(),
+    ),
+
+    ///* Loading Route
+    GoRoute(
+      path: '/loading',
+      builder: (context, state) => const LoadingScreen(),
     ),
 
     ///* Menu Routes

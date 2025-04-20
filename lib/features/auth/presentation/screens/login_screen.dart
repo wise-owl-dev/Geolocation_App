@@ -214,7 +214,7 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
           // ref.read(authProvider.notifier).signInWithGoogle();
         },
         icon: Image.asset(
-          'assets/google_logo.png',  // Asegúrate de tener esta imagen
+          'assets/images/google_logo.png',  // Asegúrate de tener esta imagen
           height: 24,
         ),
         label: const Text(
