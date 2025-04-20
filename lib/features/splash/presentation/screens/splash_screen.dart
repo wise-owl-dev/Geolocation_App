@@ -1,38 +1,8 @@
-// features/shared/presentation/screens/splash_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class SplashScreen extends ConsumerStatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
-  
-  @override
-  SplashScreenState createState() => SplashScreenState();
-}
-
-class SplashScreenState extends ConsumerState<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Simular tiempo de carga y luego navegar
-    Future.delayed(const Duration(seconds: 2), () {
-      _checkFirstTime();
-    });
-  }
-  
-  // Verificar si es la primera vez que se abre la app
-  Future<void> _checkFirstTime() async {
-    final prefs = await SharedPreferences.getInstance();
-    final firstTime = !(prefs.getBool('first_time_completed') ?? false);
-    
-    if (!mounted) return;
-    
-    if (firstTime) {
-      // Es la primera vez, marcar como ya visto
-      await prefs.setBool('first_time_completed', true);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +13,9 @@ class SplashScreenState extends ConsumerState<SplashScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.fromARGB(255, 33, 150, 243), // AZUL más oscuro
-              Color.fromARGB(255, 195, 223, 245), // AZUL más claro
+              Color.fromARGB(255,33,150,243), // AZUL más oscuro
+               // AZUL más claro
+              Color.fromARGB(255, 195, 223, 245)
             ],
           ),
         ),
@@ -57,12 +28,12 @@ class SplashScreenState extends ConsumerState<SplashScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(10.0),
                   child: Image.asset(
-                    'assets/images/splash_image.png', // Cambia a un asset local
+                    'assets/splash_image.png', // Cambia a un asset local
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
                         Icons.directions_bus,
-                        size: 120,
+                        size: 700,
                         color: Colors.white,
                       );
                     },
@@ -105,12 +76,9 @@ class SplashScreenState extends ConsumerState<SplashScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // Navegar a la pantalla de login usando go_router
-                          context.go('/login');
-                        },
+                        onPressed: ()=> context.push('/login'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 33, 150, 243),
+                          backgroundColor: const Color.fromARGB(255,33,150,243),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
