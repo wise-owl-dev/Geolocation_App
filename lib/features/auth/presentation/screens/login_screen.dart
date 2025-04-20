@@ -1,13 +1,17 @@
-// lib/features/auth/presentation/screens/login_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../shared/widgets/widgets.dart';
+import 'package:maps/features/auth/presentation/providers/login_form_provider.dart';
+import 'package:maps/features/shared/shared.dart';
 
-class LoginScreen extends StatelessWidget {
+
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -26,24 +30,24 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-class _LoginForm extends StatefulWidget {
+class _LoginForm extends ConsumerStatefulWidget {
   const _LoginForm({Key? key}) : super(key: key);
 
   @override
   _LoginFormState createState() => _LoginFormState();
 }
 
-class _LoginFormState extends State<_LoginForm> {
+class _LoginFormState extends ConsumerState<_LoginForm> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   
-  // Valores del formulario
-  String email = '';
-  String password = '';
-  bool isFormPosted = false;
-  bool isPosting = false;
-  
+
   @override
   Widget build(BuildContext context) {
+    // Aquí podrías usar tu provider para el formulario
+    final loginForm = ref.watch(loginFormProvider);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -51,87 +55,56 @@ class _LoginFormState extends State<_LoginForm> {
         const SizedBox(height: 32),
 
         CustomTextFormField(
-          label: 'Email',
-          hint: 'correo@ejemplo.com',
-          keyboardType: TextInputType.emailAddress,
-          onChanged: (value) {
-            setState(() {
-              email = value;
-            });
-          },
-          errorMessage: isFormPosted && (email.isEmpty || !email.contains('@')) ?
-                'Ingrese un email válido' 
-                : null,
+        label: 'Email',
+        hint: 'correo@ejemplo.com',
+        keyboardType: TextInputType.emailAddress,
+        onChanged: ref.read(loginFormProvider.notifier).onEmailChange,
+        errorMessage: loginForm.isFormPosted ?
+               loginForm.email.errorMessage 
+               : null,
         ),
     
         const SizedBox(height: 16),
 
-        // Campo de contraseña
-        Stack(
-          alignment: Alignment.centerRight,
-          children: [
-            CustomTextFormField(
-              label: 'Contraseña',
-              hint: '********',
-              obscureText: _obscurePassword,
-              onChanged: (value) {
-                setState(() {
-                  password = value;
-                });
-              },
-              errorMessage: isFormPosted && password.isEmpty ?
-                  'La contraseña es obligatoria' 
-                  : null, 
+      // Campo de contraseña
+      Stack(
+      alignment: Alignment.centerRight,
+      children: [
+        CustomTextFormField(
+          label: 'Contraseña',
+          hint: '********',
+          obscureText: _obscurePassword,
+          onChanged: ref.read(loginFormProvider.notifier).onPasswordChanged,
+          errorMessage:loginForm.isFormPosted ?
+               loginForm.password.errorMessage 
+               : null, 
+        ),
+          
+        // Posicionar el botón para mostrar/ocultar contraseña
+        Positioned(
+          right: 15,
+          child: IconButton(
+            icon: Icon(
+              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+              color: Colors.grey,
             ),
-              
-            // Posicionar el botón para mostrar/ocultar contraseña
-            Positioned(
-              right: 15,
-              child: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              ),
-            ),
-          ],
-        ), 
+            onPressed: () {
+              setState(() {
+                _obscurePassword = !_obscurePassword;
+              });
+            },
+          ),
+        ),
+      ],
+      ), 
         _buildForgotPasswordLink(),
 
         const SizedBox(height: 24),
         CustomFilledButton(
-          text: isPosting ? 'Iniciando sesión...' : 'Iniciar Sesión',
-          isLoading: isPosting,
-          onPressed: isPosting 
-            ? null 
-            : () {
-                setState(() {
-                  isFormPosted = true;
-                });
-                
-                // Validar el formulario
-                if (email.isNotEmpty && email.contains('@') && password.isNotEmpty) {
-                  // Aquí iría la lógica de inicio de sesión
-                  setState(() {
-                    isPosting = true;
-                  });
-                  
-                  // Simulamos un inicio de sesión exitoso después de un breve retraso
-                  Future.delayed(const Duration(seconds: 2), () {
-                    setState(() {
-                      isPosting = false;
-                    });
-                    
-                    // Navegar a la pantalla principal
-                    context.go('/home');
-                  });
-                }
-              },
+          text: 'Iniciar Sesión',
+          onPressed: () {
+            ref.read(loginFormProvider.notifier).onFormSubmit();
+          },
         ),
 
         const SizedBox(height: 24),
@@ -143,7 +116,7 @@ class _LoginFormState extends State<_LoginForm> {
       ],
     );
   }
-  
+
   Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,6 +157,10 @@ class _LoginFormState extends State<_LoginForm> {
       ],
     );
   }
+
+  
+
+ 
 
   Widget _buildForgotPasswordLink() {
     return Align(
@@ -233,17 +210,12 @@ class _LoginFormState extends State<_LoginForm> {
       ),
       child: OutlinedButton.icon(
         onPressed: () {
-          // Esta funcionalidad necesitaría ser implementada
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Funcionalidad no implementada'))
-          );
+          // Implementar lógica de login con Google
+          // ref.read(authProvider.notifier).signInWithGoogle();
         },
         icon: Image.asset(
-          'assets/google_logo.png',
+          'assets/google_logo.png',  // Asegúrate de tener esta imagen
           height: 24,
-          errorBuilder: (context, error, stackTrace) {
-            return const Icon(Icons.login, color: Colors.blue);
-          },
         ),
         label: const Text(
           'Iniciar con Google',
@@ -273,10 +245,7 @@ class _LoginFormState extends State<_LoginForm> {
           style: TextStyle(color: Colors.black54),
         ),
         TextButton(
-          onPressed: () {
-            // Usar go_router para navegar a la pantalla de registro
-            context.push('/signup');
-          },
+          onPressed: () => context.push('/signup'),
           child: const Text(
             'Regístrate',
             style: TextStyle(
@@ -287,5 +256,12 @@ class _LoginFormState extends State<_LoginForm> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
