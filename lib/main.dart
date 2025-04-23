@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:maps/config/router/app_router.dart';
+import 'core/config/router/app_router.dart' show routerProvider;
+import 'core/services/auth_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Inicializar Supabase
+  await initializeSupabase();
+  
   runApp(
-  ProviderScope(
-    child: const MyApp(),
-  )
+    const ProviderScope(
+      child: MyApp(),
+    )
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appRouter = ref.watch(routerProvider);
+    
     return MaterialApp.router(
-      title: 'Login App',
+      title: 'TransporteTrack',
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
