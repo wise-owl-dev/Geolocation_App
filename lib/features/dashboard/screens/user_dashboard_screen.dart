@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class AdminMenuScreen extends StatelessWidget {
-  const AdminMenuScreen({super.key});
+class UserDashboardScreen extends StatelessWidget {
+  const UserDashboardScreen({super.key});
 
   void _handleMenuOption(BuildContext context, String option) {
     print('Navegando a: $option');
@@ -9,8 +10,8 @@ class AdminMenuScreen extends StatelessWidget {
   }
 
   void _handleLogout(BuildContext context) {
-    // Implementar cierre de sesión
-    Navigator.of(context).pushReplacementNamed('/login');
+    // TODO: Implementar cierre de sesión real
+    context.go('/login');
   }
 
   @override
@@ -19,7 +20,7 @@ class AdminMenuScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Encabezado de usuario admin
+            // Encabezado de usuario
             Container(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -32,7 +33,7 @@ class AdminMenuScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: const Icon(
-                      Icons.admin_panel_settings,
+                      Icons.person,
                       color: Colors.blue,
                       size: 30,
                     ),
@@ -42,14 +43,14 @@ class AdminMenuScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Administrador',
+                        'Pasajero',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'admin@transporte.com',
+                        'user@example.com',
                         style: TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -63,35 +64,42 @@ class AdminMenuScreen extends StatelessWidget {
 
             const Divider(),
 
-            // Opciones del menú de admin
+            // Opciones del menú de usuario
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 children: [
                   _MenuOption(
-                    icon: Icons.person_outline,
-                    title: 'Operadores',
-                    onTap: () => _handleMenuOption(context, 'Operadores'),
+                    icon: Icons.directions_bus,
+                    title: 'Rutas en Tiempo Real',
+                    badge: 'Nuevo',
+                    onTap: () => _handleMenuOption(context, 'Rutas en Tiempo Real'),
                   ),
                   _MenuOption(
-                    icon: Icons.settings,
-                    title: 'Autobuses',
-                    onTap: () => _handleMenuOption(context, 'Autobuses'),
+                    icon: Icons.calendar_today,
+                    title: 'Horarios',
+                    onTap: () => _handleMenuOption(context, 'Horarios'),
                   ),
                   _MenuOption(
-                    icon: Icons.analytics_outlined,
-                    title: 'Recorridos',
-                    onTap: () => _handleMenuOption(context, 'Recorridos'),
+                    icon: Icons.map,
+                    title: 'Paradas Cercanas',
+                    onTap: () => _handleMenuOption(context, 'Paradas Cercanas'),
                   ),
                   _MenuOption(
-                    icon: Icons.analytics_outlined,
-                    title: 'Asignaciones',
-                    onTap: () => _handleMenuOption(context, 'Asignaciones'),
+                    icon: Icons.search,
+                    title: 'Buscar Ruta',
+                    onTap: () => _handleMenuOption(context, 'Buscar Ruta'),
                   ),
                   _MenuOption(
-                    icon: Icons.analytics_outlined,
-                    title: 'Paradas',
-                    onTap: () => _handleMenuOption(context, 'Paradas'),
+                    icon: Icons.star_outline,
+                    title: 'Rutas Favoritas',
+                    onTap: () => _handleMenuOption(context, 'Rutas Favoritas'),
+                  ),
+                  _MenuOption(
+                    icon: Icons.notifications_outlined,
+                    title: 'Notificaciones',
+                    badge: '3',
+                    onTap: () => _handleMenuOption(context, 'Notificaciones'),
                   ),
                 ],
               ),

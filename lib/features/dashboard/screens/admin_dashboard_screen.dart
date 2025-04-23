@@ -1,25 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../auth/providers/auth_provider.dart';
 
-class OperadorMenuScreen extends StatelessWidget {
-  const OperadorMenuScreen({super.key});
+class AdminDashboardScreen extends ConsumerWidget {
+  const AdminDashboardScreen({super.key});
 
   void _handleMenuOption(BuildContext context, String option) {
     print('Navegando a: $option');
     // Implementar navegación
   }
 
-  void _handleLogout(BuildContext context) {
-    // Implementar cierre de sesión
-    Navigator.of(context).pushReplacementNamed('/login');
+  void _handleLogout(BuildContext context, WidgetRef ref) async {
+    // Usar el AuthProvider para cerrar sesión
+    await ref.read(authProvider.notifier).logout();
+    
+    // Navegar a login (esto debería hacerse automáticamente por el router,
+    // pero por seguridad lo hacemos explícitamente)
+    if (context.mounted) {
+      context.go('/login');
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Obtener información del usuario actual
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    
+    if (user == null) {
+      // Si no hay usuario, redirigir a login
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/login');
+      });
+      
+      // Mostrar indicador de carga mientras se redirige
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            // Encabezado de usuario operador
+            // Encabezado de usuario admin
             Container(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -32,30 +59,34 @@ class OperadorMenuScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: const Icon(
-                      Icons.directions_bus,
+                      Icons.admin_panel_settings,
                       color: Colors.blue,
                       size: 30,
                     ),
                   ),
                   const SizedBox(width: 15),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Operador',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      Text(
-                        'operador@transporte.com',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
+                        Text(
+                          user.email,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -63,22 +94,36 @@ class OperadorMenuScreen extends StatelessWidget {
 
             const Divider(),
 
-            // Opciones del menú de operador
+            // Opciones del menú de admin
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 children: [
                   _MenuOption(
+                    icon: Icons.person_outline,
+                    title: 'Operadores',
+                    onTap: () => _handleMenuOption(context, 'Operadores'),
+                  ),
+                  _MenuOption(
                     icon: Icons.directions_bus_outlined,
-                    title: 'Ver Recorrido',
-                    onTap: () => _handleMenuOption(context, 'Ver Recorrido'),
+                    title: 'Autobuses',
+                    onTap: () => _handleMenuOption(context, 'Autobuses'),
                   ),
                   _MenuOption(
                     icon: Icons.map_outlined,
-                    title: 'Ver Horarios',
-                    onTap: () => _handleMenuOption(context, 'Ver Horarios'),
+                    title: 'Recorridos',
+                    onTap: () => _handleMenuOption(context, 'Recorridos'),
                   ),
-                  
+                  _MenuOption(
+                    icon: Icons.assignment_outlined,
+                    title: 'Asignaciones',
+                    onTap: () => _handleMenuOption(context, 'Asignaciones'),
+                  ),
+                  _MenuOption(
+                    icon: Icons.location_on_outlined,
+                    title: 'Paradas',
+                    onTap: () => _handleMenuOption(context, 'Paradas'),
+                  ),
                 ],
               ),
             ),
@@ -90,7 +135,7 @@ class OperadorMenuScreen extends StatelessWidget {
               title: 'Cerrar sesión',
               textColor: Colors.blue,
               iconColor: Colors.blue,
-              onTap: () => _handleLogout(context),
+              onTap: () => _handleLogout(context, ref),
             ),
             const SizedBox(height: 16),
           ],
@@ -100,7 +145,7 @@ class OperadorMenuScreen extends StatelessWidget {
   }
 }
 
-// Reutilizamos la misma clase _MenuOption del menú de admin
+// Widget personalizado para las opciones del menú
 class _MenuOption extends StatelessWidget {
   final IconData icon;
   final String title;

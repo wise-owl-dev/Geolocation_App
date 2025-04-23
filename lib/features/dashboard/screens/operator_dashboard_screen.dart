@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class UserMenuScreen extends StatelessWidget {
-  const UserMenuScreen({super.key});
+class OperatorDashboardScreen extends StatelessWidget {
+  const OperatorDashboardScreen({super.key});
 
   void _handleMenuOption(BuildContext context, String option) {
     print('Navegando a: $option');
@@ -9,8 +10,8 @@ class UserMenuScreen extends StatelessWidget {
   }
 
   void _handleLogout(BuildContext context) {
-    // Implementar cierre de sesión
-    Navigator.of(context).pushReplacementNamed('/login');
+    // TODO: Implementar cierre de sesión real
+    context.go('/login');
   }
 
   @override
@@ -19,7 +20,7 @@ class UserMenuScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Encabezado de usuario
+            // Encabezado de usuario operador
             Container(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -32,7 +33,7 @@ class UserMenuScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: const Icon(
-                      Icons.person,
+                      Icons.directions_bus,
                       color: Colors.blue,
                       size: 30,
                     ),
@@ -42,14 +43,14 @@ class UserMenuScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pasajero',
+                        'Operador',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'user@example.com',
+                        'operador@transporte.com',
                         style: TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -63,30 +64,30 @@ class UserMenuScreen extends StatelessWidget {
 
             const Divider(),
 
-            // Opciones del menú de usuario
+            // Opciones del menú de operador
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 children: [
                   _MenuOption(
-                    icon: Icons.directions_bus,
-                    title: 'Ruta En Tiempo Real',
-                    onTap: () => _handleMenuOption(context, 'Ruta En Tiempo Real'),
+                    icon: Icons.directions_bus_outlined,
+                    title: 'Ver Recorrido',
+                    onTap: () => _handleMenuOption(context, 'Ver Recorrido'),
                   ),
                   _MenuOption(
-                    icon: Icons.calendar_today,
-                    title: 'Rutas',
-                    onTap: () => _handleMenuOption(context, 'Rutas'),
+                    icon: Icons.schedule,
+                    title: 'Ver Horarios',
+                    onTap: () => _handleMenuOption(context, 'Ver Horarios'),
                   ),
                   _MenuOption(
-                    icon: Icons.map,
-                    title: 'Paradas',
-                    onTap: () => _handleMenuOption(context, 'Paradas'),
+                    icon: Icons.map_outlined,
+                    title: 'Iniciar Ruta',
+                    onTap: () => _handleMenuOption(context, 'Iniciar Ruta'),
                   ),
                   _MenuOption(
-                    icon: Icons.help_outline,
-                    title: 'Consultar Autobus',
-                    onTap: () => _handleMenuOption(context, 'Consultar Autobus'),
+                    icon: Icons.report_problem_outlined,
+                    title: 'Reportar Incidente',
+                    onTap: () => _handleMenuOption(context, 'Reportar Incidente'),
                   ),
                 ],
               ),
@@ -109,7 +110,7 @@ class UserMenuScreen extends StatelessWidget {
   }
 }
 
-// Reutilizamos la misma clase _MenuOption del menú de admin
+// Widget personalizado para las opciones del menú
 class _MenuOption extends StatelessWidget {
   final IconData icon;
   final String title;
