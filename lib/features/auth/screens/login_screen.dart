@@ -28,10 +28,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // Mostrar SnackBar si hay un error de autenticación
     if (authState.error != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Personalizar mensaje de error basado en el código
+        String errorMessage = authState.error!;
+        
+        // No mostrar mensajes de error técnicos
+        if (authState.errorCode == 'auth/invalid-credentials') {
+          errorMessage = 'Email o contraseña incorrectos. Intenta de nuevo.';
+        } else if (authState.errorCode == 'auth/email-not-verified') {
+          errorMessage = 'Por favor, confirma tu email antes de iniciar sesión.';
+        } else if (authState.errorCode == 'auth/too-many-requests') {
+          errorMessage = 'Demasiados intentos fallidos. Intenta más tarde.';
+        }
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authState.error!),
+            content: Text(errorMessage),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            action: SnackBarAction(
+              label: 'OK',
+              textColor: Colors.white,
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              },
+            ),
           ),
         );
 
@@ -123,6 +144,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   text: 'Iniciar Sesión',
                   isLoading: authState.isLoading,
                   onPressed: () async {
+                    // Cerrar el teclado
+                    FocusScope.of(context).unfocus();
+                    
                     // Usar el método onFormSubmit para validar el formulario
                     final isValid =
                         await ref
@@ -139,9 +163,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
 
                 const SizedBox(height: 24),
-                _buildOrDivider(),
                 const SizedBox(height: 24),
-                _buildGoogleSignInButton(),
                 const SizedBox(height: 24),
                 _buildSignUpLink(),
               ],
@@ -198,7 +220,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       child: TextButton(
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Funcionalidad no implementada'))
+            const SnackBar(
+              content: Text('Funcionalidad no implementada'),
+              behavior: SnackBarBehavior.floating,
+            )
           );
         },
         child: const Text(
@@ -212,61 +237,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildOrDivider() {
-    return const Row(
-      children: [
-        Expanded(child: Divider()),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text('O', style: TextStyle(color: Colors.grey)),
-        ),
-        Expanded(child: Divider()),
-      ],
-    );
-  }
-
-  Widget _buildGoogleSignInButton() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5)
-          )
-        ]
-      ),
-      child: OutlinedButton.icon(
-        onPressed: () {
-          // Implementar lógica de login con Google
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login con Google no implementado'))
-          );
-        },
-        icon: Container(
-          height: 24,
-          width: 24,
-          child: const Icon(Icons.g_mobiledata, size: 24, color: Colors.red),
-        ),
-        label: const Text(
-          'Iniciar con Google',
-          style: TextStyle(
-            color: Colors.black87,
-            fontSize: 16,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          backgroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          side: const BorderSide(color: Colors.grey, width: 0.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildSignUpLink() {
     return Row(

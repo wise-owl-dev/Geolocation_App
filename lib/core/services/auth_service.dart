@@ -7,6 +7,17 @@ final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService();
 });
 
+// Clase para manejar errores específicos de autenticación
+class AuthException implements Exception {
+  final String message;
+  final String code;
+
+  AuthException({required this.message, required this.code});
+
+  @override
+  String toString() => message;
+}
+
 // Inicializar Supabase
 Future<void> initializeSupabase() async {
   await Supabase.initialize(
@@ -50,7 +61,10 @@ class AuthService {
       );
       
       if (response.user == null) {
-        throw Exception('Autenticación fallida');
+        throw AuthException(
+          message: 'No se pudo iniciar sesión. Verifica tus credenciales.',
+          code: 'auth/invalid-credentials'
+        );
       }
       
       // Obtener datos completos del usuario
@@ -61,15 +75,53 @@ class AuthService {
           .single();
       
       return CustomUser.User.fromJson(userData);
+    } on AuthException {
+      rethrow;
     } catch (e) {
+      // Manejar diferentes tipos de errores de Supabase
+      if (e is AuthException) rethrow;
+      
+      if (e.toString().contains('Invalid login credentials')) {
+        throw AuthException(
+          message: 'Email o contraseña incorrectos. Intenta de nuevo.',
+          code: 'auth/invalid-credentials'
+        );
+      }
+      
+      if (e.toString().contains('Email not confirmed')) {
+        throw AuthException(
+          message: 'Por favor, confirma tu email antes de iniciar sesión.',
+          code: 'auth/email-not-verified'
+        );
+      }
+      
+      if (e.toString().contains('Rate limit')) {
+        throw AuthException(
+          message: 'Demasiados intentos fallidos. Intenta más tarde.',
+          code: 'auth/too-many-requests'
+        );
+      }
+      
       print('Error en login: $e');
-      throw Exception('Error al iniciar sesión: ${e.toString()}');
+      throw AuthException(
+        message: 'Error al iniciar sesión. Intenta de nuevo más tarde.',
+        code: 'auth/unknown'
+      );
     }
   }
   
   // Método para registro
   Future<CustomUser.User> signUp(String name, String lastName, String email, String password, String phone, {String? maternalLastName}) async {
     try {
+      // Verificar si el email ya existe
+      final emailExists = await this.emailExists(email);
+      if (emailExists) {
+        throw AuthException(
+          message: 'Este email ya está registrado. Intenta con otro o inicia sesión.',
+          code: 'auth/email-already-exists'
+        );
+      }
+      
       // Crear usuario en Supabase Auth
       final response = await _supabase.auth.signUp(
         email: email,
@@ -77,7 +129,10 @@ class AuthService {
       );
       
       if (response.user == null) {
-        throw Exception('Registro fallido');
+        throw AuthException(
+          message: 'No se pudo completar el registro. Intenta de nuevo.',
+          code: 'auth/signup-failed'
+        );
       }
       
       // Insertar datos adicionales en la tabla 'usuarios'
@@ -98,16 +153,46 @@ class AuthService {
           .eq('id', response.user!.id)
           .single();
       
-      return CustomUser.User.fromJson(userData)!;
+      return CustomUser.User.fromJson(userData);
+    } on AuthException {
+      rethrow;
     } catch (e) {
+      // Manejar diferentes tipos de errores de Supabase
+      if (e is AuthException) rethrow;
+      
+      if (e.toString().contains('already registered')) {
+        throw AuthException(
+          message: 'Este email ya está registrado. Intenta con otro o inicia sesión.',
+          code: 'auth/email-already-exists'
+        );
+      }
+      
+      if (e.toString().contains('password')) {
+        throw AuthException(
+          message: 'La contraseña no cumple con los requisitos de seguridad.',
+          code: 'auth/weak-password'
+        );
+      }
+      
       print('Error en registro: $e');
-      throw Exception('Error al registrar usuario: ${e.toString()}');
+      throw AuthException(
+        message: 'Error al registrar usuario. Intenta de nuevo más tarde.',
+        code: 'auth/unknown'
+      );
     }
   }
   
   // Método para cerrar sesión
   Future<void> logout() async {
-    await _supabase.auth.signOut();
+    try {
+      await _supabase.auth.signOut();
+    } catch (e) {
+      print('Error en logout: $e');
+      throw AuthException(
+        message: 'Error al cerrar sesión. Intenta de nuevo.',
+        code: 'auth/signout-failed'
+      );
+    }
   }
 
   // Método para verificar si ya existe un email
