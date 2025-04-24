@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../auth/providers/auth_provider.dart';
 
-class UserDashboardScreen extends StatelessWidget {
+class UserDashboardScreen extends ConsumerWidget {
   const UserDashboardScreen({super.key});
 
   void _handleMenuOption(BuildContext context, String option) {
@@ -9,13 +11,37 @@ class UserDashboardScreen extends StatelessWidget {
     // Implementar navegación
   }
 
-  void _handleLogout(BuildContext context) {
-    // TODO: Implementar cierre de sesión real
-    context.go('/login');
+  void _handleLogout(BuildContext context, WidgetRef ref) async {
+    // Usar el AuthProvider para cerrar sesión
+    await ref.read(authProvider.notifier).logout();
+    
+    // Navegar a login (esto debería hacerse automáticamente por el router,
+    // pero por seguridad lo hacemos explícitamente)
+    if (context.mounted) {
+      context.go('/login');
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Obtener información del usuario actual
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    
+    if (user == null) {
+      // Si no hay usuario, redirigir a login
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/login');
+      });
+      
+      // Mostrar indicador de carga mientras se redirige
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -39,24 +65,28 @@ class UserDashboardScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Pasajero',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      Text(
-                        'user@example.com',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
+                        Text(
+                          user.email,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -112,7 +142,7 @@ class UserDashboardScreen extends StatelessWidget {
               title: 'Cerrar sesión',
               textColor: Colors.blue,
               iconColor: Colors.blue,
-              onTap: () => _handleLogout(context),
+              onTap: () => _handleLogout(context, ref),
             ),
             const SizedBox(height: 16),
           ],

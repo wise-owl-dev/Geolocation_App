@@ -28,10 +28,29 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     // Mostrar SnackBar si hay un error de autenticación
     if (authState.error != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Personalizar mensaje de error basado en el código
+        String errorMessage = authState.error!;
+        
+        // No mostrar mensajes de error técnicos
+        if (authState.errorCode == 'auth/email-already-exists') {
+          errorMessage = 'Este email ya está registrado. Intenta con otro o inicia sesión.';
+        } else if (authState.errorCode == 'auth/weak-password') {
+          errorMessage = 'La contraseña no cumple con los requisitos de seguridad.';
+        }
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authState.error!),
+            content: Text(errorMessage),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            action: SnackBarAction(
+              label: 'OK',
+              textColor: Colors.white,
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              },
+            ),
           ),
         );
         
@@ -107,7 +126,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               
               // Campo de apellido materno
               CustomTextFormField(
-                label: 'Apellido Materno',
+                label: 'Apellido Materno (opcional)',
                 hint: 'Ingrese su apellido materno',
                 onChanged: ref.read(signUpFormProvider.notifier).onMaternalLastNameChanged,
                 errorMessage: signUpForm.isFormPosted ?
@@ -159,6 +178,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   ),
                 ],
               ),
+              if (signUpForm.isFormPosted && signUpForm.password.errorMessage == null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 12.0),
+                  child: Text(
+                    'La contraseña debe tener al menos 6 caracteres, una mayúscula y un número',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 16),
               
               // Campo de teléfono
@@ -178,6 +208,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 text: 'Registrarse',
                 isLoading: authState.isLoading,
                 onPressed: () async {
+                  // Cerrar el teclado
+                  FocusScope.of(context).unfocus();
+                  
                   // Usar el método onFormSubmit para validar el formulario
                   final isValid = await ref.read(signUpFormProvider.notifier).onFormSubmit();
                   

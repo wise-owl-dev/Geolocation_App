@@ -8,12 +8,14 @@ class AuthState {
   final User? user;
   final bool isAuthenticated;
   final String? error;
+  final String? errorCode;
 
   AuthState({
     required this.isLoading,
     this.user,
     required this.isAuthenticated,
     this.error,
+    this.errorCode,
   });
 
   // Estado inicial
@@ -22,6 +24,7 @@ class AuthState {
     user: null,
     isAuthenticated: false,
     error: null,
+    errorCode: null,
   );
 
   // Método copyWith para inmutabilidad
@@ -30,12 +33,14 @@ class AuthState {
     User? user,
     bool? isAuthenticated,
     String? error,
+    String? errorCode,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
       user: user ?? this.user,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
-      error: error ?? this.error,
+      error: error,
+      errorCode: errorCode,
     );
   }
 }
@@ -71,7 +76,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   // Método de login
   Future<void> login(String email, String password) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, error: null, errorCode: null);
     
     try {
       final user = await _authService.login(email, password);
@@ -82,16 +87,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isAuthenticated: true,
       );
     } catch (e) {
+      String errorMessage;
+      String errorCode = 'auth/unknown';
+      
+      if (e is AuthException) {
+        errorMessage = e.message;
+        errorCode = e.code;
+      } else {
+        errorMessage = e.toString();
+      }
+      
       state = state.copyWith(
         isLoading: false, 
-        error: e.toString(),
+        error: errorMessage,
+        errorCode: errorCode,
       );
     }
   }
 
   // Método de registro
   Future<void> signUp(String name, String lastName, String maternalLastName, String email, String password, String phone) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, error: null, errorCode: null);
     
     try {
       final user = await _authService.signUp(
@@ -109,9 +125,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isAuthenticated: true,
       );
     } catch (e) {
+      String errorMessage;
+      String errorCode = 'auth/unknown';
+      
+      if (e is AuthException) {
+        errorMessage = e.message;
+        errorCode = e.code;
+      } else {
+        errorMessage = e.toString();
+      }
+      
       state = state.copyWith(
         isLoading: false, 
-        error: e.toString(),
+        error: errorMessage,
+        errorCode: errorCode,
       );
     }
   }
@@ -124,16 +151,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _authService.logout();
       state = AuthState.initial();
     } catch (e) {
+      String errorMessage;
+      String errorCode = 'auth/unknown';
+      
+      if (e is AuthException) {
+        errorMessage = e.message;
+        errorCode = e.code;
+      } else {
+        errorMessage = e.toString();
+      }
+      
       state = state.copyWith(
         isLoading: false, 
-        error: e.toString(),
+        error: errorMessage,
+        errorCode: errorCode,
       );
     }
   }
 
   // Método para limpiar errores
   void clearError() {
-    state = state.copyWith(error: null);
+    state = state.copyWith(error: null, errorCode: null);
   }
 }
 

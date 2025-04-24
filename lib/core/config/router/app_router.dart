@@ -55,6 +55,20 @@ final routerProvider = Provider<GoRouter>((ref) {
     
     // Lógica de redirección basada en el estado de autenticación
     redirect: (context, state) {
+      // Verificar si hay error en el estado de autenticación
+      final hasAuthError = authState.error != null;
+      
+      // Si hay un error de autenticación y el usuario está en una ruta de autenticación,
+      // no redirigir (mantener en la misma página)
+      if (hasAuthError) {
+        final isAuthRoute = state.uri.toString() == '/login' || state.uri.toString() == '/signup';
+        if (isAuthRoute) {
+          return null; // Mantener en la ruta actual
+        }
+        // Si tiene error pero no está en ruta de autenticación, redirigir a login
+        return '/login';
+      }
+
       // Rutas accesibles sin autenticación
       final isPublicRoute = state.uri.toString() == '/loading' || 
                            state.uri.toString() == '/splash' || 

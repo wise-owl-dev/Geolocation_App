@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
+import '../../features/auth/providers/auth_provider.dart';
 
 class LoadingScreen extends ConsumerStatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -14,12 +15,22 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   @override
   void initState() {
     super.initState();
+    
     // Navegar a la pantalla de splash después de 2.5 segundos
+    // pero solo si no hay errores en el estado de autenticación
     Timer(
       const Duration(milliseconds: 2500),
       () {
         if (mounted) {
-          context.go('/splash');
+          final authState = ref.read(authProvider);
+          
+          // Solo navegar si no hay errores
+          if (authState.error == null) {
+            context.go('/splash');
+          } else {
+            // Si hay un error, ir directamente a login
+            context.go('/login');
+          }
         }
       },
     );
