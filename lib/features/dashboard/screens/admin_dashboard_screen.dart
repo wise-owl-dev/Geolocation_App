@@ -6,11 +6,13 @@ import '../../auth/providers/auth_provider.dart';
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
 
-  void _handleMenuOption(BuildContext context, String option) {
+    void _handleMenuOption(BuildContext context, String option) {
   print('Navegando a: $option');
   
   if (option == 'Operadores') {
     context.push('/admin/operators');
+  } else if (option == 'Autobuses') {
+    context.push('/admin/buses');
   }
   // Manejar otras opciones...
 }
