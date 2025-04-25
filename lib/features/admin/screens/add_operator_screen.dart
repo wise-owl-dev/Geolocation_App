@@ -321,7 +321,6 @@ Future<void> _loadOperatorData() async {
                           CustomTextFormField(
                             label: 'Contraseña',
                             hint: '********',
-                            controller: _nameController,
                             obscureText: _obscurePassword,
                             onChanged: ref.read(addOperatorFormProvider.notifier).onPasswordChanged,
                             errorMessage: operatorForm.isFormPosted ?

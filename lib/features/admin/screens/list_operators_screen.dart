@@ -22,6 +22,67 @@ class _OperatorsListScreenState extends ConsumerState<OperatorsListScreen> {
     });
   }
 
+  // Método para mostrar diálogo de confirmación de eliminación
+  Future<void> _confirmDeleteOperator(BuildContext context, String operatorId, String operatorName) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // El usuario debe presionar un botón para cerrar el diálogo
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Confirmar eliminación'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('¿Está seguro que desea eliminar al operador $operatorName?'),
+                const SizedBox(height: 8),
+                const Text('Esta acción no se puede deshacer.', 
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Cerrar el diálogo
+              },
+            ),
+            TextButton(
+              child: const Text('Eliminar',
+                style: TextStyle(color: Colors.red)),
+              onPressed: () async {
+                // Cerrar el diálogo primero
+                Navigator.of(dialogContext).pop();
+                
+                // Mostrar indicador de carga
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Eliminando operador...'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+                
+                // Eliminar el operador
+                await ref.read(operatorsProvider.notifier).deleteOperator(operatorId);
+                
+                // Mostrar mensaje de éxito
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Operador eliminado exitosamente'),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final operatorsState = ref.watch(operatorsProvider);
@@ -178,16 +239,34 @@ class _OperatorsListScreenState extends ConsumerState<OperatorsListScreen> {
                   ),
                 ],
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.edit, color: Colors.blue),
-                onPressed: () async {
-                  // Navegar a la pantalla de edición del operador
-                  final result = await context.push('/admin/edit-operator/${operator.id}');
-                  // Si regresamos con éxito, recargar la lista
-                  if (result == true && mounted) {
-                    ref.read(operatorsProvider.notifier).loadOperators();
-                  }
-                },
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Botón de editar
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    onPressed: () async {
+                      // Navegar a la pantalla de edición del operador
+                      final result = await context.push('/admin/edit-operator/${operator.id}');
+                      // Si regresamos con éxito, recargar la lista
+                      if (result == true && mounted) {
+                        ref.read(operatorsProvider.notifier).loadOperators();
+                      }
+                    },
+                  ),
+                  // Nuevo botón de eliminar
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      // Mostrar diálogo de confirmación
+                      _confirmDeleteOperator(
+                        context, 
+                        operator.id, 
+                        operator.fullName
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ),
