@@ -29,59 +29,54 @@ class Operator {
 
   // Factory constructor desde JSON
   factory Operator.fromJson(Map<String, dynamic> json) {
-    print('Creando Operator desde JSON: $json');
-    
-    // Convertir string de rol a UserRole enum
-    UserRole roleFromString(String roleStr) {
-      switch (roleStr.toLowerCase()) {
-        case 'admin':
-          return UserRole.admin;
-        case 'operador':
-          return UserRole.operator;
-        default:
-          return UserRole.user;
-      }
-    }
-    
-    // Manejar posibles tipos diferentes para experiencia_anios
-    int parseYearsExperience(dynamic value) {
-      if (value is int) return value;
-      if (value is String) return int.tryParse(value) ?? 0;
-      return 0;
-    }
-    
-    // Manejar posibles formatos de fecha
-    DateTime parseHireDate(dynamic value) {
-      if (value is String) {
-        try {
-          return DateTime.parse(value);
-        } catch (e) {
-          print('Error parseando fecha: $e');
-          return DateTime.now();
-        }
-      }
-      return DateTime.now();
-    }
-    
-    try {
-      return Operator(
-        id: json['id'] as String,
-        name: json['nombre'] as String,
-        email: json['email'] as String,
-        role: roleFromString(json['rol'] as String),
-        phone: json['telefono'] as String?,
-        lastNamePaterno: json['apellido_paterno'] as String?,
-        lastNameMaterno: json['apellido_materno'] as String?,
-        licenseNumber: json['numero_licencia'] as String,
-        licenseType: json['tipo_licencia'] as String,
-        yearsExperience: parseYearsExperience(json['experiencia_anios']),
-        hireDate: parseHireDate(json['fecha_contratacion']),
-      );
-    } catch (e) {
-      print('Error al crear Operator desde JSON: $e');
-      rethrow;
+  print('Creando Operator desde JSON: $json');
+  
+  // Convertir string de rol a UserRole enum
+  UserRole roleFromString(String roleStr) {
+    switch (roleStr.toLowerCase()) {
+      case 'admin':
+        return UserRole.admin;
+      case 'operador':
+        return UserRole.operator;
+      default:
+        return UserRole.user;
     }
   }
+  
+  // Manejar posibles tipos diferentes para experiencia_anios
+  int parseYearsExperience(dynamic value) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
+  }
+  
+  // Manejar posibles formatos de fecha
+  DateTime parseHireDate(dynamic value) {
+    if (value is String) {
+      try {
+        return DateTime.parse(value);
+      } catch (e) {
+        print('Error parseando fecha: $e');
+        return DateTime.now();
+      }
+    }
+    return DateTime.now();
+  }
+  
+  return Operator(
+    id: json['id'] as String,
+    name: json['nombre'] as String,
+    email: json['email'] as String,
+    role: roleFromString(json['rol'] as String),
+    phone: json['telefono'] as String?,
+    lastNamePaterno: json['apellido_paterno'] as String?,
+    lastNameMaterno: json['apellido_materno'] as String?,
+    licenseNumber: json['numero_licencia'] as String,
+    licenseType: json['tipo_licencia'] as String,
+    yearsExperience: parseYearsExperience(json['experiencia_anios']),
+    hireDate: parseHireDate(json['fecha_contratacion']),
+  );
+}
 
   // Método toJson
   Map<String, dynamic> toJson() {

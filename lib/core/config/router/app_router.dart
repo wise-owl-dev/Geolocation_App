@@ -61,6 +61,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/admin/add-operator',
         builder: (context, state) => const AddOperatorScreen(),
       ),
+      GoRoute(
+        path: '/admin/edit-operator/:id',
+        builder: (context, state) {
+          final operatorId = state.pathParameters['id'];
+          return AddOperatorScreen(operatorId: operatorId);
+        },
+      ),
     ],
     
     // Lógica de redirección basada en el estado de autenticación

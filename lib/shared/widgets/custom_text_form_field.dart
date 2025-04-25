@@ -1,3 +1,5 @@
+// lib/shared/widgets/custom_text_form_field.dart
+
 import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatelessWidget {
@@ -8,6 +10,7 @@ class CustomTextFormField extends StatelessWidget {
   final TextInputType? keyboardType;
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
+  final bool enabled;
 
   const CustomTextFormField({
     super.key, 
@@ -17,7 +20,8 @@ class CustomTextFormField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.onChanged, 
-    this.validator, 
+    this.validator,
+    this.enabled = true,
   });
 
   @override
@@ -29,6 +33,7 @@ class CustomTextFormField extends StatelessWidget {
           onChanged: onChanged,
           keyboardType: keyboardType,
           obscureText: obscureText,
+          enabled: enabled,
           decoration: InputDecoration(
             labelText: label,
             hintText: hint,
@@ -47,6 +52,13 @@ class CustomTextFormField extends StatelessWidget {
               fontWeight: FontWeight.w500,
               fontSize: 12,
             ),
+            // Estilo cuando el campo está deshabilitado
+            disabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            fillColor: enabled ? null : Colors.grey.shade100,
+            filled: !enabled,
           ),
           
         ),
