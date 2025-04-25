@@ -31,22 +31,49 @@ class _AddOperatorScreenState extends ConsumerState<AddOperatorScreen> {
   bool _isEditMode = false;
   bool _isLoading = false;
 
-  
-  @override
+// 1. Primero, agrega estos controladores en la clase _AddOperatorScreenState
+final TextEditingController _nameController = TextEditingController();
+final TextEditingController _lastNameController = TextEditingController();
+final TextEditingController _maternalLastNameController = TextEditingController();
+final TextEditingController _emailController = TextEditingController();
+final TextEditingController _phoneController = TextEditingController();
+final TextEditingController _licenseNumberController = TextEditingController();
+final TextEditingController _licenseTypeController = TextEditingController();
+final TextEditingController _yearsExperienceController = TextEditingController();
+
+// 2. Asegúrate de liberar los controladores en dispose
+@override
+void dispose() {
+  _nameController.dispose();
+  _lastNameController.dispose();
+  _maternalLastNameController.dispose();
+  _emailController.dispose();
+  _phoneController.dispose();
+  _licenseNumberController.dispose();
+  _licenseTypeController.dispose();
+  _yearsExperienceController.dispose();
+  _scrollController.dispose();
+  super.dispose();
+}
+
+@override
 void initState() {
   super.initState();
   
   // Verificar si estamos en modo edición
   _isEditMode = widget.operatorId != null;
   
-  // No cargar datos aquí, lo haremos después del primer frame
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (_isEditMode && mounted) {
-      _loadOperatorData();
-    }
-  });
+  // Usar un enfoque diferente para cargar los datos
+  if (_isEditMode) {
+    // Esperar a que el widget esté completamente construido
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadOperatorData();
+      }
+    });
+  }
 }
-
+// 3. Reemplaza completamente el método _loadOperatorData
 Future<void> _loadOperatorData() async {
   if (!mounted) return;
   
@@ -55,82 +82,70 @@ Future<void> _loadOperatorData() async {
   try {
     print('Cargando datos del operador ID: ${widget.operatorId}');
     
-    // Primero, cargar el operador
+    // Cargar el operador
     await ref.read(editOperatorProvider.notifier).loadOperator(widget.operatorId!);
     
-    // Asegurarnos que el widget sigue montado
-    if (!mounted) return;
-    
-    // Obtener los datos del operador
+    // Obtener los datos
     final operatorState = ref.read(editOperatorProvider);
+    
+    print('Estado del operador: ${operatorState.isLoading}, Error: ${operatorState.error}');
+    
     final operator = operatorState.operator;
     
     if (operator == null) {
-      print('No se pudieron obtener datos del operador');
+      print('⚠️ Operador no encontrado');
       setState(() => _isLoading = false);
       return;
     }
     
-    print('Datos obtenidos: Nombre=${operator.name}, Email=${operator.email}');
+    print('✅ Datos recibidos. ID: ${operator.id}, Nombre: ${operator.name}');
     
-    // Necesitamos un pequeño delay para que el formulario se actualice correctamente
-    await Future.delayed(Duration(milliseconds: 200));
-    
-    if (!mounted) return;
-    
-    // Actualizar los campos del formulario uno por uno
-    final formNotifier = ref.read(addOperatorFormProvider.notifier);
-    
-    // Campos básicos
-    formNotifier.onEmailChange(operator.email);
-    print('Email actualizado: ${operator.email}');
-    
-    formNotifier.onNameChanged(operator.name);
-    print('Nombre actualizado: ${operator.name}');
-    
-    if (operator.lastNamePaterno != null) {
-      formNotifier.onLastNameChanged(operator.lastNamePaterno!);
-      print('Apellido paterno actualizado: ${operator.lastNamePaterno}');
+    // Establecer valores en los controladores
+    _nameController.text = operator.name;
+    if (operator.lastNamePaterno != null && operator.lastNamePaterno!.isNotEmpty) {
+      _lastNameController.text = operator.lastNamePaterno!;
     }
-    
     if (operator.lastNameMaterno != null && operator.lastNameMaterno!.isNotEmpty) {
-      formNotifier.onMaternalLastNameChanged(operator.lastNameMaterno!);
-      print('Apellido materno actualizado: ${operator.lastNameMaterno}');
+      _maternalLastNameController.text = operator.lastNameMaterno!;
     }
-    
-    if (operator.phone != null) {
-      formNotifier.onPhoneChanged(operator.phone!);
-      print('Teléfono actualizado: ${operator.phone}');
+    _emailController.text = operator.email;
+    if (operator.phone != null && operator.phone!.isNotEmpty) {
+      _phoneController.text = operator.phone!;
     }
+    _licenseNumberController.text = operator.licenseNumber;
+    _licenseTypeController.text = operator.licenseType;
+    _yearsExperienceController.text = operator.yearsExperience.toString();
     
-    // Campos específicos de operador
-    formNotifier.onLicenseNumberChanged(operator.licenseNumber);
-    print('Número de licencia actualizado: ${operator.licenseNumber}');
-    
-    formNotifier.onLicenseTypeChanged(operator.licenseType);
-    print('Tipo de licencia actualizado: ${operator.licenseType}');
-    
-    formNotifier.onYearsExperienceChanged(operator.yearsExperience.toString());
-    print('Años de experiencia actualizado: ${operator.yearsExperience}');
-    
-    // Actualizar la fecha seleccionada
+    // Actualizar fecha de contratación
     setState(() {
       _selectedDate = operator.hireDate;
-      print('Fecha de contratación actualizada: $_selectedDate');
     });
     
+    // También actualizar el estado del formulario
+    final formNotifier = ref.read(addOperatorFormProvider.notifier);
+    formNotifier.onEmailChange(operator.email);
+    formNotifier.onNameChanged(operator.name);
+    if (operator.lastNamePaterno != null) {
+      formNotifier.onLastNameChanged(operator.lastNamePaterno!);
+    }
+    if (operator.lastNameMaterno != null) {
+      formNotifier.onMaternalLastNameChanged(operator.lastNameMaterno!);
+    }
+    if (operator.phone != null) {
+      formNotifier.onPhoneChanged(operator.phone!);
+    }
+    formNotifier.onLicenseNumberChanged(operator.licenseNumber);
+    formNotifier.onLicenseTypeChanged(operator.licenseType);
+    formNotifier.onYearsExperienceChanged(operator.yearsExperience.toString());
     formNotifier.onHireDateChanged(operator.hireDate);
     
-    print('Formulario completamente actualizado');
+    print('✅ Controladores actualizados y formulario rellenado');
     
   } catch (e) {
-    print('Error cargando datos del operador: $e');
+    print('❌ Error cargando datos: $e');
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al cargar datos: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red)
       );
     }
   } finally {
@@ -139,12 +154,6 @@ Future<void> _loadOperatorData() async {
     }
   }
 }
-  
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -258,6 +267,7 @@ Future<void> _loadOperatorData() async {
                     CustomTextFormField(
                       label: 'Nombre',
                       hint: 'Ingrese el nombre',
+                      controller: _nameController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onNameChanged,
                       errorMessage: operatorForm.isFormPosted ?
                           operatorForm.name.errorMessage 
@@ -269,6 +279,7 @@ Future<void> _loadOperatorData() async {
                     CustomTextFormField(
                       label: 'Apellido Paterno',
                       hint: 'Ingrese el apellido paterno',
+                      controller: _lastNameController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onLastNameChanged,
                       errorMessage: operatorForm.isFormPosted ?
                           operatorForm.lastName.errorMessage 
@@ -280,6 +291,7 @@ Future<void> _loadOperatorData() async {
                     CustomTextFormField(
                       label: 'Apellido Materno (opcional)',
                       hint: 'Ingrese el apellido materno',
+                      controller: _maternalLastNameController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onMaternalLastNameChanged,
                       errorMessage: operatorForm.isFormPosted ?
                           operatorForm.maternalLastName.errorMessage 
@@ -291,6 +303,7 @@ Future<void> _loadOperatorData() async {
                     CustomTextFormField(
                       label: 'Email',
                       hint: 'correo@ejemplo.com',
+                      controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onEmailChange,
                       errorMessage: operatorForm.isFormPosted ?
@@ -308,6 +321,7 @@ Future<void> _loadOperatorData() async {
                           CustomTextFormField(
                             label: 'Contraseña',
                             hint: '********',
+                            controller: _nameController,
                             obscureText: _obscurePassword,
                             onChanged: ref.read(addOperatorFormProvider.notifier).onPasswordChanged,
                             errorMessage: operatorForm.isFormPosted ?
@@ -350,6 +364,7 @@ Future<void> _loadOperatorData() async {
                     CustomTextFormField(
                       label: 'Teléfono',
                       hint: 'Ingrese el número de teléfono',
+                      controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onPhoneChanged,
                       errorMessage: operatorForm.isFormPosted ?
@@ -371,7 +386,8 @@ Future<void> _loadOperatorData() async {
                     // Campo de número de licencia
                     CustomTextFormField(
                       label: 'Número de Licencia',
-                      hint: 'Ej. A123456',
+                      hint: 'Ej. 12345678',
+                      controller: _licenseNumberController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onLicenseNumberChanged,
                       errorMessage: operatorForm.isFormPosted ?
                           operatorForm.licenseNumber.errorMessage 
@@ -383,7 +399,8 @@ Future<void> _loadOperatorData() async {
                     // Campo de tipo de licencia
                     CustomTextFormField(
                       label: 'Tipo de Licencia',
-                      hint: 'Ej. Profesional Tipo C',
+                      hint: 'Ej. C',
+                      controller: _licenseTypeController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onLicenseTypeChanged,
                       errorMessage: operatorForm.isFormPosted ?
                           operatorForm.licenseType.errorMessage 
@@ -395,6 +412,7 @@ Future<void> _loadOperatorData() async {
                     CustomTextFormField(
                       label: 'Años de Experiencia',
                       hint: 'Ej. 5',
+                      controller: _yearsExperienceController,
                       keyboardType: TextInputType.number,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onYearsExperienceChanged,
                       errorMessage: operatorForm.isFormPosted ?
