@@ -102,24 +102,41 @@ class OperatorsNotifier extends StateNotifier<OperatorsState> {
       );
     }
   }
-  // Método para eliminar un operador
+  
+  // Método simplificado para eliminar un operador - enfoque más directo
   Future<void> deleteOperator(String operatorId) async {
     state = state.copyWith(isLoading: true, error: null);
     
     try {
-      // Eliminar el operador (Supabase se encargará de eliminar los datos relacionados por la restricción CASCADE)
+      print('Eliminando operador con ID: $operatorId');
+      
+      // Enfoque principal: Eliminar de la tabla usuarios (esto eliminará en cascada de operadores)
       await _supabase
           .from('usuarios')
           .delete()
           .eq('id', operatorId);
       
-      // Actualizar el estado local removiendo el operador eliminado
+      print('Usuario eliminado de la tabla usuarios correctamente');
+      
+      // Una vez eliminado de la base de datos, actualizamos el estado local
       final updatedOperators = state.operators.where((op) => op.id != operatorId).toList();
       
       state = state.copyWith(
         isLoading: false,
         operators: updatedOperators,
       );
+      
+      // Como paso adicional, intentamos llamar a la función RPC para limpiar auth
+      // Pero no dejamos que esto afecte el flujo principal
+      try {
+        await _supabase.rpc('delete_complete_user', params: {'input_user_id': operatorId});
+        print('Limpieza adicional completada');
+      } catch (rpcError) {
+        // Simplemente registramos el error pero no lo propagamos
+        print('Nota: Error en limpieza adicional: $rpcError');
+      }
+      
+      print('Operador eliminado exitosamente');
     } catch (e) {
       print('Error eliminando operador: $e');
       state = state.copyWith(
