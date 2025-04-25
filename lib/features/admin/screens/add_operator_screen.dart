@@ -320,6 +320,10 @@ class _AddOperatorScreenState extends ConsumerState<AddOperatorScreen> {
                     hireDate: _selectedDate,
                     maternalLastName: operatorForm.maternalLastName.value,
                   );
+
+                  // Resetear el estado y regresar con un valor para indicar éxito
+                  ref.read(addOperatorProvider.notifier).reset();
+                  context.pop(true);
                 },
               ),
             ],

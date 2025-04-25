@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../features/admin/screens/add_operator_screen.dart';
-import '../../services/auth_service.dart';
+import '../../../features/admin/screens/list_operators_screen.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/auth/screens/login_screen.dart';
 import '../../../features/auth/screens/signup_screen.dart';
@@ -54,6 +53,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       
       // Rutas de administrador
+      GoRoute(
+        path: '/admin/operators',
+        builder: (context, state) => const OperatorsListScreen(),
+      ),
       GoRoute(
         path: '/admin/add-operator',
         builder: (context, state) => const AddOperatorScreen(),
