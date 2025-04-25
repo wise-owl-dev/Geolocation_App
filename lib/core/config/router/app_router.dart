@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../features/admin/screens/add_bus_screen.dart';
 import '../../../features/admin/screens/add_operator_screen.dart';
+import '../../../features/admin/screens/list_buses_screen.dart';
 import '../../../features/admin/screens/list_operators_screen.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/auth/screens/login_screen.dart';
@@ -66,6 +68,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final operatorId = state.pathParameters['id'];
           return AddOperatorScreen(operatorId: operatorId);
+        },
+      ),
+
+       // Rutas de administrador para autobuses
+      GoRoute(
+        path: '/admin/buses',
+        builder: (context, state) => const BusesListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/add-bus',
+        builder: (context, state) => const AddBusScreen(),
+      ),
+      GoRoute(
+        path: '/admin/edit-bus/:id',
+        builder: (context, state) {
+          final busId = state.pathParameters['id'];
+          return AddBusScreen(busId: busId);
         },
       ),
     ],
