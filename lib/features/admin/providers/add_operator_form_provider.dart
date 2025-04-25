@@ -1,3 +1,5 @@
+// lib/features/admin/providers/add_operator_form_provider.dart
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
 import '../../../shared/inputs/inputs.dart';
@@ -146,7 +148,7 @@ class AddOperatorFormNotifier extends StateNotifier<AddOperatorFormState> {
     state = state.copyWith(
       hireDate: value,
     );
-    _validateForm();
+    // No validamos aquí para evitar errores en carga inicial
   }
 
   // Método auxiliar para validar el formulario
@@ -238,6 +240,41 @@ class AddOperatorFormNotifier extends StateNotifier<AddOperatorFormState> {
         yearsExperience,
       ]),
     );
+  }
+  
+  void onFormSubmitForEdit() {
+    // No necesitamos validar email, password o license number en modo edición
+    final name = Name.dirty(state.name.value);
+    final lastName = LastName.dirty(state.lastName.value);
+    final phone = Phone.dirty(state.phone.value);
+    // El apellido materno es opcional
+    final maternalLastName = state.maternalLastName.value.isNotEmpty 
+      ? LastName.dirty(state.maternalLastName.value)
+      : const LastName.pure();
+    final licenseType = LicenseType.dirty(state.licenseType.value);
+    final yearsExperience = YearsExperience.dirty(state.yearsExperience.value);
+
+    state = state.copyWith(
+      isFormPosted: true,
+      name: name,
+      lastName: lastName,
+      maternalLastName: maternalLastName,
+      phone: phone,
+      licenseType: licenseType,
+      yearsExperience: yearsExperience,
+      isValid: Formz.validate([
+        name, 
+        lastName, 
+        phone,
+        licenseType,
+        yearsExperience,
+      ]),
+    );
+  }
+
+  Future<bool> onFormSubmitForEditing() async {
+    onFormSubmitForEdit();
+    return state.isValid;
   }
 }
 

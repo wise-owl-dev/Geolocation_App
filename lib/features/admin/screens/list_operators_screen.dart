@@ -56,7 +56,7 @@ class _OperatorsListScreenState extends ConsumerState<OperatorsListScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Botón de agregar operador
+              
               // Lista de operadores
               Expanded(
                 child: operatorsState.isLoading
@@ -180,9 +180,13 @@ class _OperatorsListScreenState extends ConsumerState<OperatorsListScreen> {
               ),
               trailing: IconButton(
                 icon: const Icon(Icons.edit, color: Colors.blue),
-                onPressed: () {
-                  // Aquí podrías navegar a una pantalla de edición del operador
-                  // context.push('/admin/edit-operator/${operator.id}');
+                onPressed: () async {
+                  // Navegar a la pantalla de edición del operador
+                  final result = await context.push('/admin/edit-operator/${operator.id}');
+                  // Si regresamos con éxito, recargar la lista
+                  if (result == true && mounted) {
+                    ref.read(operatorsProvider.notifier).loadOperators();
+                  }
                 },
               ),
             ),
