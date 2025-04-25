@@ -7,9 +7,13 @@ class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
 
   void _handleMenuOption(BuildContext context, String option) {
-    print('Navegando a: $option');
-    // Implementar navegación
+  print('Navegando a: $option');
+  
+  if (option == 'Operadores') {
+    context.push('/admin/add-operator');
   }
+  // Manejar otras opciones...
+}
 
   void _handleLogout(BuildContext context, WidgetRef ref) async {
     // Usar el AuthProvider para cerrar sesión
