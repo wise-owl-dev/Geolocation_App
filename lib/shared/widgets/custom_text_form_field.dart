@@ -11,6 +11,7 @@ class CustomTextFormField extends StatelessWidget {
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final bool enabled;
+  final TextEditingController? controller; // Agregar este parámetro
 
   const CustomTextFormField({
     super.key, 
@@ -22,6 +23,7 @@ class CustomTextFormField extends StatelessWidget {
     this.onChanged, 
     this.validator,
     this.enabled = true,
+    this.controller, // Agregar esto
   });
 
   @override
@@ -30,6 +32,7 @@ class CustomTextFormField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextFormField(
+          controller: controller,
           onChanged: onChanged,
           keyboardType: keyboardType,
           obscureText: obscureText,

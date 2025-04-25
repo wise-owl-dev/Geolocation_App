@@ -5,8 +5,9 @@ enum LicenseNumberError { empty, format }
 
 // Clase para validación de Número de Licencia
 class LicenseNumber extends FormzInput<String, LicenseNumberError> {
+  // Cambiamos la expresión regular para solo aceptar números
   static final RegExp licenseNumberRegExp = RegExp(
-    r'^[0-9-]+$',
+    r'^[0-9]+$',
   );
 
   // Constructor para valor no modificado
@@ -19,7 +20,8 @@ class LicenseNumber extends FormzInput<String, LicenseNumberError> {
     if (isValid || isPure) return null;
 
     if (displayError == LicenseNumberError.empty) return 'El número de licencia es requerido';
-    if (displayError == LicenseNumberError.format) return 'Formato de licencia inválido (letras mayúsculas, números y guiones)';
+    // Actualizamos el mensaje de error para reflejar que solo se permiten números
+    if (displayError == LicenseNumberError.format) return 'El número de licencia solo debe contener números';
 
     return null;
   }
