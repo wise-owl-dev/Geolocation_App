@@ -41,6 +41,7 @@ dependencies:
   formz: ^0.8.0
   shared_preferences: ^2.5.3
   uuid: ^4.5.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

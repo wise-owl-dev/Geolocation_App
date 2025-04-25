@@ -209,4 +209,135 @@ class AuthService {
       return false;
     }
   }
+// Método mejorado para crear un operador
+Future<User> createOperator({
+  required String name,
+  required String lastName,
+  required String email,
+  required String password,
+  required String phone,
+  required String licenseNumber,
+  required String licenseType,
+  required int yearsExperience,
+  required DateTime hireDate,
+  String? maternalLastName,
+}) async {
+  try {
+    // Verificar si el email ya existe
+    final emailExists = await this.emailExists(email);
+    if (emailExists) {
+      throw AuthException(
+        message: 'Este email ya está registrado. Intenta con otro.',
+        code: 'auth/email-already-exists'
+      );
+    }
+    
+    // Verificar si el número de licencia ya existe
+    final licenseExists = await _checkLicenseExists(licenseNumber);
+    if (licenseExists) {
+      throw AuthException(
+        message: 'Este número de licencia ya está registrado.',
+        code: 'auth/license-already-exists'
+      );
+    }
+    
+    // Crear usuario en Supabase Auth
+    print('Creando usuario en Supabase Auth...');
+    final response = await _supabase.auth.signUp(
+      email: email,
+      password: password,
+    );
+    
+    if (response.user == null) {
+      throw AuthException(
+        message: 'No se pudo completar el registro. Intenta de nuevo.',
+        code: 'auth/signup-failed'
+      );
+    }
+    
+    final userId = response.user!.id;
+    print('Usuario creado con ID: $userId');
+    
+    // Insertar datos en la tabla 'usuarios'
+    print('Insertando datos en la tabla usuarios...');
+    try {
+      await _supabase.from('usuarios').insert({
+        'id': userId,
+        'email': email,
+        'nombre': name,
+        'apellido_paterno': lastName,
+        'apellido_materno': maternalLastName,
+        'telefono': phone,
+        'rol': 'operador', // Asignar rol de operador
+      });
+      print('Datos insertados correctamente en la tabla usuarios');
+    } catch (e) {
+      print('Error insertando en tabla usuarios: $e');
+      // Si falla la inserción en usuarios, eliminar el usuario de Auth
+      await _supabase.auth.admin.deleteUser(userId);
+      throw AuthException(
+        message: 'Error al registrar usuario en la base de datos: $e',
+        code: 'auth/db-error'
+      );
+    }
+    
+    // Insertar datos específicos del operador
+    print('Insertando datos en la tabla operadores...');
+    try {
+      // Convertir la fecha a formato ISO y tomar solo la parte de la fecha
+      final hireDateStr = hireDate.toIso8601String().split('T')[0];
+      print('Fecha de contratación formateada: $hireDateStr');
+      
+      await _supabase.from('operadores').insert({
+        'id': userId,
+        'numero_licencia': licenseNumber,
+        'tipo_licencia': licenseType,
+        'experiencia_anios': yearsExperience,
+        'fecha_contratacion': hireDateStr,
+      });
+      print('Datos insertados correctamente en la tabla operadores');
+    } catch (e) {
+      print('Error insertando en tabla operadores: $e');
+      // Si falla la inserción en operadores, podríamos eliminar el usuario
+      // o dejar que el administrador lo complete manualmente
+      throw AuthException(
+        message: 'Error al registrar datos del operador: $e',
+        code: 'auth/db-error-operator'
+      );
+    }
+    
+    // Obtener el usuario creado
+    print('Obteniendo datos completos del usuario creado...');
+    final userData = await _supabase
+        .from('usuarios')
+        .select()
+        .eq('id', userId)
+        .single();
+    
+    return User.fromJson(userData)!;
+  } on AuthException {
+    rethrow;
+  } catch (e) {
+    print('Error inesperado en createOperator: $e');
+    throw AuthException(
+      message: 'Error al registrar operador: $e',
+      code: 'auth/unknown'
+    );
+  }
+}
+
+// Método auxiliar para verificar si ya existe un número de licencia
+Future<bool> _checkLicenseExists(String licenseNumber) async {
+  try {
+    final response = await _supabase
+        .from('operadores')
+        .select('numero_licencia')
+        .eq('numero_licencia', licenseNumber);
+    
+    return response.isNotEmpty;
+  } catch (e) {
+    print('Error verificando licencia: $e');
+    return false;
+  }
+}
 }
