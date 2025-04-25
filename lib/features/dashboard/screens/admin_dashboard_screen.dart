@@ -10,7 +10,7 @@ class AdminDashboardScreen extends ConsumerWidget {
   print('Navegando a: $option');
   
   if (option == 'Operadores') {
-    context.push('/admin/add-operator');
+    context.push('/admin/operators');
   }
   // Manejar otras opciones...
 }
