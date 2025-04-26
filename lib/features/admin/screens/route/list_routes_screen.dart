@@ -275,28 +275,30 @@ class _RoutesListScreenState extends ConsumerState<RoutesListScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Edit button
+                // Botón de ver/editar paradas
+                IconButton(
+                  icon: const Icon(Icons.location_on, color: Colors.purple),
+                  tooltip: 'Gestionar paradas',
+                  onPressed: () {
+                    // Navegar a la pantalla de paradas del recorrido
+                    context.push('/admin/route-stops/${route.id}');
+                  },
+                ),
+                // Botón de editar (existente)
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: () async {
-                    // Navigate to edit screen
                     final result = await context.push('/admin/edit-route/${route.id}');
-                    // If we return with success, reload the list
                     if (result == true && mounted) {
                       ref.read(routesProvider.notifier).loadRoutes();
                     }
                   },
                 ),
-                // Delete button
+                // Botón de eliminar (existente)
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () {
-                    // Show confirmation dialog
-                    _confirmDeleteRoute(
-                      context, 
-                      route.id, 
-                      route.name
-                    );
+                    _confirmDeleteRoute(context, route.id, route.name);
                   },
                 ),
               ],

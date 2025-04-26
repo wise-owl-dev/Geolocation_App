@@ -9,6 +9,7 @@ import '../../../features/admin/screens/operator/add_operator_screen.dart';
 import '../../../features/admin/screens/operator/list_operators_screen.dart';
 import '../../../features/admin/screens/route/add_route_screen.dart';
 import '../../../features/admin/screens/route/list_routes_screen.dart';
+import '../../../features/admin/screens/route/route_stops_screen.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/auth/screens/login_screen.dart';
 import '../../../features/auth/screens/signup_screen.dart';
@@ -123,6 +124,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final routeId = state.pathParameters['id'];
           return AddRouteScreen(routeId: routeId);
+        },
+      ),
+      GoRoute(
+        path: '/admin/route-stops/:id',
+        builder: (context, state) {
+          final routeId = state.pathParameters['id'];
+          return RouteStopsScreen(routeId: routeId!);
         },
       ),
     ],
