@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../providers/add_operator_form_provider.dart';
-import '../providers/add_operator_provider.dart';
-import '../providers/edit_operator_provider.dart';
-import '../../../shared/widgets/custom_text_form_field.dart';
-import '../../../shared/widgets/custom_filled_button.dart';
-import '../../../shared/models/operator.dart';
+import '../../providers/operator/add_operator_form_provider.dart';
+import '../../providers/operator/add_operator_provider.dart';
+import '../../providers/operator/edit_operator_provider.dart';
+import '../../../../shared/widgets/custom_text_form_field.dart';
+import '../../../../shared/widgets/custom_filled_button.dart';
+import '../../../../shared/models/operator.dart';
 
 class AddOperatorScreen extends ConsumerStatefulWidget {
   final String? operatorId;

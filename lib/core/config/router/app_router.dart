@@ -1,9 +1,14 @@
+
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../features/admin/screens/add_bus_screen.dart';
-import '../../../features/admin/screens/add_operator_screen.dart';
-import '../../../features/admin/screens/list_buses_screen.dart';
-import '../../../features/admin/screens/list_operators_screen.dart';
+import '../../../features/admin/screens/bus/add_bus_screen.dart';
+import '../../../features/admin/screens/bus/list_buses_screen.dart';
+import '../../../features/admin/screens/bus_stop/add_busstop_screen.dart';
+import '../../../features/admin/screens/bus_stop/list_busstops_screen.dart';
+import '../../../features/admin/screens/operator/add_operator_screen.dart';
+import '../../../features/admin/screens/operator/list_operators_screen.dart';
+import '../../../features/admin/screens/route/add_route_screen.dart';
+import '../../../features/admin/screens/route/list_routes_screen.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/auth/screens/login_screen.dart';
 import '../../../features/auth/screens/signup_screen.dart';
@@ -12,7 +17,6 @@ import '../../../shared/screens/loading_screen.dart';
 import '../../../features/dashboard/screens/admin_dashboard_screen.dart';
 import '../../../features/dashboard/screens/operator_dashboard_screen.dart';
 import '../../../features/dashboard/screens/user_dashboard_screen.dart';
-
 // Provider para el router
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -85,6 +89,40 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final busId = state.pathParameters['id'];
           return AddBusScreen(busId: busId);
+        },
+      ),
+
+      // Rutas de administrador para paradas
+      GoRoute(
+        path: '/admin/busstops',
+        builder: (context, state) => const BusStopsListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/add-busstop',
+        builder: (context, state) => const AddBusStopScreen(),
+      ),
+      GoRoute(
+        path: '/admin/edit-busstop/:id',
+        builder: (context, state) {
+          final busStopId = state.pathParameters['id'];
+          return AddBusStopScreen(busStopId: busStopId);
+        },
+      ),
+
+       // Rutas de administrador para recorridos
+      GoRoute(
+        path: '/admin/routes',
+        builder: (context, state) => const RoutesListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/add-route',
+        builder: (context, state) => const AddRouteScreen(),
+      ),
+      GoRoute(
+        path: '/admin/edit-route/:id',
+        builder: (context, state) {
+          final routeId = state.pathParameters['id'];
+          return AddRouteScreen(routeId: routeId);
         },
       ),
     ],
