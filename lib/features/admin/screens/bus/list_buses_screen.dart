@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/buses_provider.dart';
-import '../../../shared/widgets/custom_filled_button.dart';
+import '../../providers/bus/buses_provider.dart';
+import '../../../../shared/widgets/custom_filled_button.dart';
 
 class BusesListScreen extends ConsumerStatefulWidget {
   const BusesListScreen({Key? key}) : super(key: key);

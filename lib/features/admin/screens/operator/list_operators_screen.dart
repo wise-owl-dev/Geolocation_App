@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../providers/operators_provider.dart';
-import '../../../shared/widgets/custom_filled_button.dart';
+import '../../providers/operator/operators_provider.dart';
+import '../../../../shared/widgets/custom_filled_button.dart';
 
 class OperatorsListScreen extends ConsumerStatefulWidget {
   const OperatorsListScreen({Key? key}) : super(key: key);

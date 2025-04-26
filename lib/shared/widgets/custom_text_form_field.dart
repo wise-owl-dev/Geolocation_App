@@ -11,7 +11,9 @@ class CustomTextFormField extends StatelessWidget {
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final bool enabled;
-  final TextEditingController? controller; // Agregar este parámetro
+  final TextEditingController? controller;
+  final Widget? suffixIcon;
+  final int? maxLines;
 
   const CustomTextFormField({
     super.key, 
@@ -23,7 +25,9 @@ class CustomTextFormField extends StatelessWidget {
     this.onChanged, 
     this.validator,
     this.enabled = true,
-    this.controller, // Agregar esto
+    this.controller,
+    this.suffixIcon,
+    this.maxLines = 1,
   });
 
   @override
@@ -37,6 +41,7 @@ class CustomTextFormField extends StatelessWidget {
           keyboardType: keyboardType,
           obscureText: obscureText,
           enabled: enabled,
+          maxLines: maxLines,
           decoration: InputDecoration(
             labelText: label,
             hintText: hint,
@@ -62,6 +67,7 @@ class CustomTextFormField extends StatelessWidget {
             ),
             fillColor: enabled ? null : Colors.grey.shade100,
             filled: !enabled,
+            suffixIcon: suffixIcon,
           ),
           
         ),

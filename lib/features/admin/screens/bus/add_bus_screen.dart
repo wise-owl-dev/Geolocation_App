@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../providers/add_bus_form_provider.dart';
-import '../providers/add_bus_provider.dart';
-import '../providers/edit_bus_provider.dart';
-import '../../../shared/widgets/custom_text_form_field.dart';
-import '../../../shared/widgets/custom_filled_button.dart';
+import '../../providers/bus/add_bus_form_provider.dart';
+import '../../providers/bus/add_bus_provider.dart';
+import '../../providers/bus/edit_bus_provider.dart';
+import '../../../../shared/widgets/custom_text_form_field.dart';
+import '../../../../shared/widgets/custom_filled_button.dart';
 
 class AddBusScreen extends ConsumerStatefulWidget {
   final String? busId;

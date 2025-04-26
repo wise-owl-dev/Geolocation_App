@@ -13,6 +13,10 @@ class AdminDashboardScreen extends ConsumerWidget {
     context.push('/admin/operators');
   } else if (option == 'Autobuses') {
     context.push('/admin/buses');
+  } else if (option == 'Paradas') {
+    context.push('/admin/busstops');
+  } else if (option == 'Recorridos') {
+    context.push('/admin/routes');
   }
   // Manejar otras opciones...
 }

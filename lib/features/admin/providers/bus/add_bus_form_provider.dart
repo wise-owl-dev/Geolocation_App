@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
-import '../inputs/bus_inputs/inputs.dart';
+import '../../inputs/bus_inputs/inputs.dart';
 
 // Form state
 class AddBusFormState {

@@ -2,7 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../shared/models/operator.dart';
+import '../../../../shared/models/operator.dart';
 
 class EditOperatorState {
   final bool isLoading;
