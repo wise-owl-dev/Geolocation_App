@@ -8,7 +8,12 @@ class OperatorDashboardScreen extends ConsumerWidget {
 
   void _handleMenuOption(BuildContext context, String option) {
     print('Navegando a: $option');
-    // Implementar navegación
+    
+    // Implementar navegación según la opción
+    if (option == 'Ver Horarios') {
+      context.push('/operator/schedules');
+    }
+    // Las demás opciones se implementarán posteriormente
   }
 
   void _handleLogout(BuildContext context, WidgetRef ref) async {
@@ -109,6 +114,7 @@ class OperatorDashboardScreen extends ConsumerWidget {
                     title: 'Ver Horarios',
                     onTap: () => _handleMenuOption(context, 'Ver Horarios'),
                   ),
+                  
                   _MenuOption(
                     icon: Icons.map_outlined,
                     title: 'Iniciar Ruta',
@@ -119,6 +125,7 @@ class OperatorDashboardScreen extends ConsumerWidget {
                     title: 'Reportar Incidente',
                     onTap: () => _handleMenuOption(context, 'Reportar Incidente'),
                   ),
+                  
                 ],
               ),
             ),
