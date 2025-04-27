@@ -266,6 +266,14 @@ class _BusesListScreenState extends ConsumerState<BusesListScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Botón para asignar
+                IconButton(
+                  icon: const Icon(Icons.assignment, color: Colors.purple),
+                  tooltip: 'Asignar a operador',
+                  onPressed: () {
+                    _showAssignOperatorDialog(context, bus.id, bus.busNumber);
+                  },
+                ),
                 // Edit button
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
@@ -297,4 +305,13 @@ class _BusesListScreenState extends ConsumerState<BusesListScreen> {
       },
     );
   }
+
+  void _showAssignOperatorDialog(BuildContext context, String busId, String busNumber) async {
+  // Navegar a la pantalla de creación de asignación con el autobús preseleccionado
+  final result = await context.push('/admin/add-assignment?busId=$busId');
+  if (result == true && mounted) {
+    // Recargar la lista si es necesario
+    ref.read(busesProvider.notifier).loadBuses();
+  }
+}
 }

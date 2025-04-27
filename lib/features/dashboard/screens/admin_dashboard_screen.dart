@@ -20,8 +20,9 @@ class AdminDashboardScreen extends ConsumerWidget {
     context.push('/admin/busstops');
   } else if (option == 'Recorridos') {
     context.push('/admin/routes');
+  } else if (option == 'Asignaciones') {
+    context.push('/admin/assignments');
   } else if (option == 'ParadasPorRecorrido') {
-    // Primero cargar los recorridos y mostrar un diálogo para seleccionar uno
     _showSelectRouteDialog(context);
   }
 }

@@ -242,6 +242,14 @@ class _OperatorsListScreenState extends ConsumerState<OperatorsListScreen> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                   // Botón para asignar
+                  IconButton(
+                    icon: const Icon(Icons.assignment, color: Colors.purple),
+                    tooltip: 'Asignar recorrido',
+                    onPressed: () {
+                      _showAssignRouteDialog(context, operator.id, operator.fullName);
+                    },
+                  ),
                   // Botón de editar
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.blue),
@@ -274,4 +282,14 @@ class _OperatorsListScreenState extends ConsumerState<OperatorsListScreen> {
       },
     );
   }
+
+  // Añadir este método
+void _showAssignRouteDialog(BuildContext context, String operatorId, String operatorName) async {
+  // Navegar a la pantalla de creación de asignación con el operador preseleccionado
+  final result = await context.push('/admin/add-assignment?operatorId=$operatorId');
+  if (result == true && mounted) {
+    // Recargar la lista si es necesario
+    ref.read(operatorsProvider.notifier).loadOperators();
+  }
+}
 }
