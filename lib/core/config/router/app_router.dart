@@ -15,6 +15,7 @@ import '../../../features/admin/screens/route/route_stops_screen.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/auth/screens/login_screen.dart';
 import '../../../features/auth/screens/signup_screen.dart';
+import '../../../features/user/screens/search_bus_screen.dart';
 import '../../../shared/screens/splash_screen.dart';
 import '../../../shared/screens/loading_screen.dart';
 import '../../../features/dashboard/screens/admin_dashboard_screen.dart';
@@ -135,34 +136,40 @@ final routerProvider = Provider<GoRouter>((ref) {
           return RouteStopsScreen(routeId: routeId!);
         },
       ),
-
       GoRoute(
-  path: '/admin/assignments',
-  builder: (context, state) => const AssignmentsListScreen(),
-),
-GoRoute(
-  path: '/admin/add-assignment',
-  builder: (context, state) {
-    // Extraer parámetros de query
-    final operatorId = state.uri.queryParameters['operatorId'];
-    final busId = state.uri.queryParameters['busId'];
-    final routeId = state.uri.queryParameters['routeId'];
-    
-    return AddAssignmentScreen(
-      preselectedOperatorId: operatorId,
-      preselectedBusId: busId,
-      preselectedRouteId: routeId,
-    );
-  },
-),
-GoRoute(
-  path: '/admin/edit-assignment/:id',
-  builder: (context, state) {
-    final assignmentId = state.pathParameters['id']!;
-    return AddAssignmentScreen(assignmentId: assignmentId);
-  },
-),
-    ],
+        path: '/admin/assignments',
+        builder: (context, state) => const AssignmentsListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/add-assignment',
+        builder: (context, state) {
+          // Extraer parámetros de query
+          final operatorId = state.uri.queryParameters['operatorId'];
+          final busId = state.uri.queryParameters['busId'];
+          final routeId = state.uri.queryParameters['routeId'];
+          
+          return AddAssignmentScreen(
+            preselectedOperatorId: operatorId,
+            preselectedBusId: busId,
+            preselectedRouteId: routeId,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/admin/edit-assignment/:id',
+        builder: (context, state) {
+          final assignmentId = state.pathParameters['id']!;
+          return AddAssignmentScreen(assignmentId: assignmentId);
+        },
+      ),
+
+
+      // Rutas de usuario
+      GoRoute(
+        path: '/user/bus-search',
+        builder: (context, state) => const BusSearchScreen(),
+        ),
+    ],   
     
     // Lógica de redirección basada en el estado de autenticación
     redirect: (context, state) {

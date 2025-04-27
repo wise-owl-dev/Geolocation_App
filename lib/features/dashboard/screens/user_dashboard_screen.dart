@@ -8,7 +8,12 @@ class UserDashboardScreen extends ConsumerWidget {
 
   void _handleMenuOption(BuildContext context, String option) {
     print('Navegando a: $option');
-    // Implementar navegación
+    
+    // Implementar navegación según la opción
+    if (option == 'Buscar Autobús') {
+      context.push('/user/bus-search');
+    }
+    // Las demás opciones se implementarán más adelante
   }
 
   void _handleLogout(BuildContext context, WidgetRef ref) async {
