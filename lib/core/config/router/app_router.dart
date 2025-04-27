@@ -1,6 +1,8 @@
 
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../features/admin/screens/assignment/add_assignment_screen.dart';
+import '../../../features/admin/screens/assignment/assignments_list_screen.dart';
 import '../../../features/admin/screens/bus/add_bus_screen.dart';
 import '../../../features/admin/screens/bus/list_buses_screen.dart';
 import '../../../features/admin/screens/bus_stop/add_busstop_screen.dart';
@@ -133,6 +135,33 @@ final routerProvider = Provider<GoRouter>((ref) {
           return RouteStopsScreen(routeId: routeId!);
         },
       ),
+
+      GoRoute(
+  path: '/admin/assignments',
+  builder: (context, state) => const AssignmentsListScreen(),
+),
+GoRoute(
+  path: '/admin/add-assignment',
+  builder: (context, state) {
+    // Extraer parámetros de query
+    final operatorId = state.uri.queryParameters['operatorId'];
+    final busId = state.uri.queryParameters['busId'];
+    final routeId = state.uri.queryParameters['routeId'];
+    
+    return AddAssignmentScreen(
+      preselectedOperatorId: operatorId,
+      preselectedBusId: busId,
+      preselectedRouteId: routeId,
+    );
+  },
+),
+GoRoute(
+  path: '/admin/edit-assignment/:id',
+  builder: (context, state) {
+    final assignmentId = state.pathParameters['id']!;
+    return AddAssignmentScreen(assignmentId: assignmentId);
+  },
+),
     ],
     
     // Lógica de redirección basada en el estado de autenticación

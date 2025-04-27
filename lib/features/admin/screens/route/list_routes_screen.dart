@@ -275,6 +275,14 @@ class _RoutesListScreenState extends ConsumerState<RoutesListScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Botón para asignar
+                IconButton(
+                  icon: const Icon(Icons.assignment, color: Colors.purple),
+                  tooltip: 'Asignar operador y autobús',
+                  onPressed: () {
+                    _showAssignOperatorBusDialog(context, route.id, route.name);
+                  },
+                ),
                 // Botón de ver/editar paradas
                 IconButton(
                   icon: const Icon(Icons.location_on, color: Colors.purple),
@@ -308,6 +316,15 @@ class _RoutesListScreenState extends ConsumerState<RoutesListScreen> {
       },
     );
   }
+
+  void _showAssignOperatorBusDialog(BuildContext context, String routeId, String routeName) async {
+  // Navegar a la pantalla de creación de asignación con el recorrido preseleccionado
+  final result = await context.push('/admin/add-assignment?routeId=$routeId');
+  if (result == true && mounted) {
+    // Recargar la lista si es necesario
+    ref.read(routesProvider.notifier).loadRoutes();
+  }
+}
   
   // Helper method to format days
   String _formatDays(List<String> days) {
