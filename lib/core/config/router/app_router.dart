@@ -15,6 +15,7 @@ import '../../../features/admin/screens/route/route_stops_screen.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/auth/screens/login_screen.dart';
 import '../../../features/auth/screens/signup_screen.dart';
+import '../../../features/operator/screens/operator_schedules_screen.dart';
 import '../../../features/user/screens/search_bus_screen.dart';
 import '../../../shared/screens/splash_screen.dart';
 import '../../../shared/screens/loading_screen.dart';
@@ -169,6 +170,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/user/bus-search',
         builder: (context, state) => const BusSearchScreen(),
         ),
+
+       // Rutas de operador
+      GoRoute(
+        path: '/operator/schedules',
+        builder: (context, state) => const OperatorSchedulesScreen(),
+      ),
     ],   
     
     // Lógica de redirección basada en el estado de autenticación
