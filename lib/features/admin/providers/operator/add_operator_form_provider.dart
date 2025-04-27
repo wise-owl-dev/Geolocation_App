@@ -2,7 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
-import '../../../../shared/inputs/inputs.dart';
+import '../../../auth/inputs/inputs.dart';
 import '../../inputs/operator_inputs/inputs.dart';
 
 //! 1 - State del provider
