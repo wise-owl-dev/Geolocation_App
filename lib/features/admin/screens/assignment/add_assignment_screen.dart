@@ -47,15 +47,56 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
   TimeOfDay _endTime = TimeOfDay(hour: TimeOfDay.now().hour + 1, minute: 0);
   AssignmentStatus _status = AssignmentStatus.programada;
   
+  // Límites de operación dinámicos (inicializados con valores por defecto)
+  TimeOfDay _minOperationTime = TimeOfDay(hour: 5, minute: 20);
+  TimeOfDay _maxOperationTime = TimeOfDay(hour: 21, minute: 45);
+  
   @override
   void initState() {
-  super.initState();
-  _isEditMode = widget.assignmentId != null;
-  _selectedOperatorId = widget.preselectedOperatorId;
-  _selectedBusId = widget.preselectedBusId;
-  _selectedRouteId = widget.preselectedRouteId;
-  _loadInitialData();
-}
+    super.initState();
+    _isEditMode = widget.assignmentId != null;
+    _selectedOperatorId = widget.preselectedOperatorId;
+    _selectedBusId = widget.preselectedBusId;
+    _selectedRouteId = widget.preselectedRouteId;
+    
+    // Ajustar hora de inicio a la actual si es hoy
+    _adjustStartTimeToNow();
+    
+    _loadInitialData();
+  }
+  
+  // Método para ajustar la hora de inicio a la hora actual si es necesario
+  void _adjustStartTimeToNow() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDay = DateTime(_startDate.year, _startDate.month, _startDate.day);
+    
+    // Solo si la fecha seleccionada es hoy
+    if (selectedDay.isAtSameMomentAs(today)) {
+      final currentTime = TimeOfDay.now();
+      
+      // Si la hora actual es posterior a la hora de inicio seleccionada
+      // actualizar la hora de inicio a la actual + 15 minutos (para dar margen)
+      final currentMinutes = currentTime.hour * 60 + currentTime.minute;
+      final selectedMinutes = _startTime.hour * 60 + _startTime.minute;
+      
+      if (currentMinutes >= selectedMinutes) {
+        // Sumar 15 minutos a la hora actual
+        int newMinutes = currentMinutes + 15;
+        _startTime = TimeOfDay(
+          hour: newMinutes ~/ 60, 
+          minute: newMinutes % 60
+        );
+        
+        // Actualizar hora de fin para mantener al menos 30 minutos de duración
+        int endMinutes = _startTime.hour * 60 + _startTime.minute + 30;
+        _endTime = TimeOfDay(
+          hour: endMinutes ~/ 60,
+          minute: endMinutes % 60
+        );
+      }
+    }
+  }
   
   Future<void> _loadInitialData() async {
     setState(() {
@@ -64,7 +105,10 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
     });
     
     try {
-      // Cargar operadores, autobuses y recorridos
+      // 1. Cargar los límites de operación desde los recorridos
+      await _loadOperationLimits();
+      
+      // 2. Cargar operadores, autobuses y recorridos
       final operatorsResult = await _supabase
           .from('usuarios')
           .select('id, nombre, apellido_paterno, apellido_materno')
@@ -89,7 +133,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
         _routes = routesResult;
       });
       
-      // Si estamos en modo edición, cargar datos de la asignación
+      // 3. En modo edición, cargar datos de la asignación
       if (_isEditMode) {
         await _loadAssignmentData();
       }
@@ -103,6 +147,60 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
         _isLoading = false;
         _error = 'Error al cargar datos iniciales: $e';
       });
+    }
+  }
+  
+  // Método para cargar los límites de operación desde los recorridos
+  Future<void> _loadOperationLimits() async {
+    try {
+      final routesResult = await _supabase
+          .from('recorridos')
+          .select('horario_inicio, horario_fin')
+          .eq('estado', 'activo');
+      
+      if (routesResult.isEmpty) {
+        return; // Mantener los valores por defecto
+      }
+      
+      // Función para convertir string de tiempo "HH:MM:SS" a TimeOfDay
+      TimeOfDay parseTimeString(String timeStr) {
+        final parts = timeStr.split(':');
+        return TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1])
+        );
+      }
+      
+      // Función para convertir TimeOfDay a minutos totales para comparación
+      int timeToMinutes(TimeOfDay time) => time.hour * 60 + time.minute;
+      
+      // Inicializar con el primer recorrido
+      var earliestStart = parseTimeString(routesResult[0]['horario_inicio']);
+      var latestEnd = parseTimeString(routesResult[0]['horario_fin']);
+      
+      // Encontrar el inicio más temprano y el fin más tardío
+      for (var route in routesResult) {
+        final routeStart = parseTimeString(route['horario_inicio']);
+        final routeEnd = parseTimeString(route['horario_fin']);
+        
+        if (timeToMinutes(routeStart) < timeToMinutes(earliestStart)) {
+          earliestStart = routeStart;
+        }
+        
+        if (timeToMinutes(routeEnd) > timeToMinutes(latestEnd)) {
+          latestEnd = routeEnd;
+        }
+      }
+      
+      // Actualizar los límites de operación
+      setState(() {
+        _minOperationTime = earliestStart;
+        _maxOperationTime = latestEnd;
+        print('Límites de operación actualizados: ${_formatTimeOfDay(_minOperationTime)} - ${_formatTimeOfDay(_maxOperationTime)}');
+      });
+    } catch (e) {
+      print('Error al cargar los límites de operación: $e');
+      // Mantener los valores por defecto si hay error
     }
   }
   
@@ -150,9 +248,19 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
     }
   }
   
+  // Método para seleccionar fecha con validación de fecha actual
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    final DateTime initialDate = isStartDate ? _startDate : (_endDate ?? DateTime.now());
-    final DateTime firstDate = isStartDate ? DateTime.now() : _startDate;
+    final DateTime currentDate = DateTime.now();
+    
+    // Para fecha de inicio, no permitir fechas anteriores a hoy
+    final DateTime initialDate = isStartDate 
+        ? (_startDate.isBefore(currentDate) ? currentDate : _startDate)
+        : (_endDate ?? DateTime.now());
+    
+    // Para fecha de inicio, establecer primera fecha como hoy
+    final DateTime firstDate = isStartDate 
+        ? currentDate 
+        : _startDate;
     
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -165,6 +273,12 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
       setState(() {
         if (isStartDate) {
           _startDate = picked;
+          
+          // Si se selecciona la fecha actual, ajustar la hora
+          if (_isSameDay(picked, currentDate)) {
+            _adjustStartTimeToNow();
+          }
+          
           // Si la fecha de fin es anterior a la de inicio, actualizarla
           if (_endDate != null && _endDate!.isBefore(_startDate)) {
             _endDate = _startDate;
@@ -176,36 +290,341 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
     }
   }
   
+  // Método auxiliar para comparar si dos fechas son el mismo día
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year && 
+           date1.month == date2.month && 
+           date1.day == date2.day;
+  }
+  
+  // Método para seleccionar hora con validaciones de tiempo
   Future<void> _selectTime(BuildContext context, bool isStartTime) async {
     final TimeOfDay initialTime = isStartTime ? _startTime : _endTime;
     
-    final TimeOfDay? picked = await showTimePicker(
+    // Construir un objeto para la fecha y hora actual
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDay = DateTime(_startDate.year, _startDate.month, _startDate.day);
+    
+    TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: initialTime,
+      // Desactivar la selección de minutos que no sean múltiplos de 5
+      minuteLabelText: 'Minutos (5 min)',
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            alwaysUse24HourFormat: true,
+          ),
+          child: child!,
+        );
+      },
     );
     
     if (picked != null) {
-      setState(() {
-        if (isStartTime) {
-          _startTime = picked;
-          // Si la hora de fin es anterior a la de inicio, actualizarla
-          final startMinutes = _startTime.hour * 60 + _startTime.minute;
-          final endMinutes = _endTime.hour * 60 + _endTime.minute;
-          if (endMinutes <= startMinutes) {
-            _endTime = TimeOfDay(
-              hour: (_startTime.hour + 1) % 24,
-              minute: _startTime.minute,
+      final currentTime = TimeOfDay.now();
+      
+      // Validar que la hora seleccionada esté dentro del rango de operación
+      if (_isTimeWithinRange(picked)) {
+        // Si es el día de hoy y seleccionamos la hora de inicio
+        if (isStartTime && _isSameDay(selectedDay, today)) {
+          // Convertir a minutos para comparar
+          final pickedMinutes = picked.hour * 60 + picked.minute;
+          final currentMinutes = currentTime.hour * 60 + currentTime.minute;
+          
+          // No permitir seleccionar horas pasadas (dar 15 min de margen)
+          if (pickedMinutes <= currentMinutes) {
+            // Mostrar error
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('No puedes seleccionar una hora que ya pasó. La hora mínima para hoy es ${_formatTimeOfDay(currentTime)}'),
+                backgroundColor: Colors.red,
+              ),
             );
+            return;
           }
-        } else {
-          _endTime = picked;
         }
-      });
+        
+        setState(() {
+          if (isStartTime) {
+            _startTime = picked;
+            
+            // Actualizar hora de fin si es necesario
+            final startMinutes = _startTime.hour * 60 + _startTime.minute;
+            final endMinutes = _endTime.hour * 60 + _endTime.minute;
+            
+            // Si hora de fin <= hora de inicio, actualizar hora de fin
+            if (endMinutes <= startMinutes) {
+              // Añadir al menos 30 minutos
+              int newEndMinutes = startMinutes + 30;
+              _endTime = TimeOfDay(
+                hour: newEndMinutes ~/ 60,
+                minute: newEndMinutes % 60
+              );
+              
+              // Verificar que no exceda el límite
+              if (!_isTimeWithinRange(_endTime)) {
+                _endTime = _maxOperationTime;
+                
+                // Notificar que se ajustó al límite
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('La hora de fin ha sido ajustada al límite de operación (${_formatTimeOfDay(_maxOperationTime)})'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+              }
+            }
+          } else {
+            _endTime = picked;
+            
+            // Validar que hora de fin sea posterior a hora de inicio
+            final startMinutes = _startTime.hour * 60 + _startTime.minute;
+            final endMinutes = _endTime.hour * 60 + _endTime.minute;
+            
+            if (endMinutes <= startMinutes) {
+              // Hora de fin debe ser posterior a hora de inicio
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('La hora de fin debe ser posterior a la hora de inicio'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              
+              // Revertir al valor anterior
+              _endTime = initialTime;
+            }
+          }
+        });
+      } else {
+        // Mostrar error: hora fuera de rango
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('La hora debe estar entre ${_formatTimeOfDay(_minOperationTime)} y ${_formatTimeOfDay(_maxOperationTime)}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
   
+  // Método auxiliar para formatear TimeOfDay
+  String _formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+  
+  // Método para validar si un horario está dentro del rango permitido
+  bool _isTimeWithinRange(TimeOfDay time) {
+    // Convertir TimeOfDay a minutos para facilitar la comparación
+    int timeToMinutes(TimeOfDay t) => t.hour * 60 + t.minute;
+    
+    final timeInMinutes = timeToMinutes(time);
+    final minInMinutes = timeToMinutes(_minOperationTime);
+    final maxInMinutes = timeToMinutes(_maxOperationTime);
+    
+    return timeInMinutes >= minInMinutes && timeInMinutes <= maxInMinutes;
+  }
+  
+  // Método para verificar solapamiento de horarios
+  bool _isTimeOverlap(String start1, String end1, String start2, String end2) {
+    // Convertir cadenas de tiempo 'HH:MM:SS' a minutos para comparación confiable
+    int timeToMinutes(String timeStr) {
+      final parts = timeStr.split(':');
+      return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+    }
+    
+    final start1Minutes = timeToMinutes(start1);
+    final end1Minutes = timeToMinutes(end1);
+    final start2Minutes = timeToMinutes(start2);
+    final end2Minutes = timeToMinutes(end2);
+    
+    // Verificar solapamiento usando valores numéricos
+    return start1Minutes < end2Minutes && end1Minutes > start2Minutes;
+  }
+  
+  // Método para validar la asignación completa
+  Future<String?> _validateAssignment() async {
+    // Validar horario de operación
+    if (!_isTimeWithinRange(_startTime)) {
+      return "La hora de inicio debe estar entre ${_formatTimeOfDay(_minOperationTime)} y ${_formatTimeOfDay(_maxOperationTime)}";
+    }
+    
+    if (!_isTimeWithinRange(_endTime)) {
+      return "La hora de fin debe estar entre ${_formatTimeOfDay(_minOperationTime)} y ${_formatTimeOfDay(_maxOperationTime)}";
+    }
+    
+    // Validar selección de recursos
+    if (_selectedOperatorId == null || _selectedBusId == null || _selectedRouteId == null) {
+      return "Debe seleccionar un operador, un autobús y un recorrido";
+    }
+    
+    // Validar duración mínima (30 minutos)
+    final startMinutes = _startTime.hour * 60 + _startTime.minute;
+    final endMinutes = _endTime.hour * 60 + _endTime.minute;
+    final durationMinutes = endMinutes - startMinutes;
+    
+    if (durationMinutes < 30) {
+      return "La duración mínima de una asignación debe ser de 30 minutos";
+    }
+    
+    // Validar duración máxima (8 horas)
+    if (durationMinutes > 8 * 60) {
+      return "La duración máxima de una asignación debe ser de 8 horas";
+    }
+    
+    try {
+      // Formatear fecha y horas para consultas
+      final dateStr = _startDate.toIso8601String().split('T')[0];
+      
+      // Formatear horas a string (HH:MM:SS)
+      String formatTimeOfDay(TimeOfDay time) {
+        return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:00';
+      }
+      
+      final startTimeStr = formatTimeOfDay(_startTime);
+      final endTimeStr = formatTimeOfDay(_endTime);
+      
+      // Validar disponibilidad del operador
+      final operatorAssignments = await _supabase
+          .from('asignaciones')
+          .select()
+          .eq('operador_id', _selectedOperatorId ?? '')
+          .eq('fecha_inicio', dateStr)
+          .neq('estado', 'cancelada');
+      
+      // Si estamos editando, excluir la asignación actual
+      List filteredOperatorAssignments = operatorAssignments;
+      if (_isEditMode && widget.assignmentId != null) {
+        filteredOperatorAssignments = operatorAssignments.where(
+          (a) => a['id'] != widget.assignmentId
+        ).toList();
+      }
+      
+      // Verificar solapamientos con asignaciones del operador
+      for (var assignment in filteredOperatorAssignments) {
+        if (_isTimeOverlap(
+          startTimeStr, 
+          endTimeStr, 
+          assignment['hora_inicio'], 
+          assignment['hora_fin']
+        )) {
+          return "El operador ya tiene una asignación en ese horario";
+        }
+      }
+      
+      // Validar disponibilidad del autobús
+      final busAssignments = await _supabase
+          .from('asignaciones')
+          .select()
+          .eq('autobus_id', _selectedBusId ?? '')
+          .eq('fecha_inicio', dateStr)
+          .neq('estado', 'cancelada');
+      
+      // Si estamos editando, excluir la asignación actual
+      List filteredBusAssignments = busAssignments;
+      if (_isEditMode && widget.assignmentId != null) {
+        filteredBusAssignments = busAssignments.where(
+          (a) => a['id'] != widget.assignmentId
+        ).toList();
+      }
+      
+      // Verificar solapamientos con asignaciones del autobús
+      for (var assignment in filteredBusAssignments) {
+        if (_isTimeOverlap(
+          startTimeStr, 
+          endTimeStr, 
+          assignment['hora_inicio'], 
+          assignment['hora_fin']
+        )) {
+          return "El autobús ya tiene una asignación en ese horario";
+        }
+      }
+      
+      // Validar tiempo de descanso mínimo para el operador (30 minutos)
+      for (var assignment in filteredOperatorAssignments) {
+        // Convertir la hora de fin de la asignación a minutos
+        int timeToMinutes(String timeStr) {
+          final parts = timeStr.split(':');
+          return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+        }
+        
+        final assignmentEndMinutes = timeToMinutes(assignment['hora_fin']);
+        
+        // Si la nueva asignación comienza menos de 10 minutos después de otra
+        if (startMinutes - assignmentEndMinutes < 10 && startMinutes > assignmentEndMinutes) {
+          return "El operador debe tener al menos 10 minutos de descanso entre asignaciones";
+        }
+      }
+      
+      // Validar que el autobús esté activo
+      final busData = await _supabase
+          .from('autobuses')
+          .select()
+          .eq('id', _selectedBusId ?? '')
+          .single();
+      
+      if (busData['estado'] != 'activo') {
+        return "El autobús seleccionado no está activo";
+      }
+      
+      // Verificar que la ruta esté activa
+      final routeData = await _supabase
+          .from('recorridos')
+          .select()
+          .eq('id', _selectedRouteId ?? '')
+          .single();
+      
+      if (routeData['estado'] != 'activo') {
+        return "La ruta seleccionada no está activa";
+      }
+      
+      // Verificar que la ruta opere en el día seleccionado
+      final dayOfWeek = _getDayOfWeek(_startDate);
+      List<dynamic> routeDays = routeData['dias'];
+      
+      if (!routeDays.contains(dayOfWeek)) {
+        return "La ruta seleccionada no opera los ${_getSpanishDayName(dayOfWeek)}";
+      }
+      
+      // Si llegamos aquí, no hay problemas
+      return null;
+    } catch (e) {
+      print('Error en validación: $e');
+      return "Error al validar la asignación: $e";
+    }
+  }
+  
+  // Método auxiliar para obtener el día de la semana en español
+  String _getDayOfWeek(DateTime date) {
+    final days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    return days[date.weekday % 7]; // % 7 porque DateTime usa 1-7 con domingo=7
+  }
+  
+  // Método auxiliar para obtener el nombre en español para mensajes
+  String _getSpanishDayName(String day) {
+    // Capitalizar la primera letra
+    return day.substring(0, 1).toUpperCase() + day.substring(1);
+  }
+  
+  // Método para guardar la asignación con validaciones
   Future<void> _saveAssignment() async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    
+    // Validar la asignación antes de guardar
+    final validationError = await _validateAssignment();
+    if (validationError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(validationError),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
+        ),
+      );
       return;
     }
     
@@ -320,7 +739,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sección de selección de operador, autobús y recorrido
+            // Sección de información de la asignación
             const Text(
               'Información de la asignación',
               style: TextStyle(
@@ -398,7 +817,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
               items: _routes.map((route) {
                 return DropdownMenuItem<String>(
                   value: route['id'],
-                  child: Text(route['nombre']),
+                  child: Text('${route['nombre']} (${route['horario_inicio'].substring(0, 5)}-${route['horario_fin'].substring(0, 5)})'),
                 );
               }).toList(),
               onChanged: (value) {
@@ -415,7 +834,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
             ),
             const SizedBox(height: 24),
             
-            // Sección de fechas y horas
+            // Sección de programación
             const Text(
               'Programación',
               style: TextStyle(
@@ -522,7 +941,21 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            
+            // Horario de operación permitido (mostrar al usuario)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+              child: Text(
+                'Horario de operación: ${_formatTimeOfDay(_minOperationTime)} - ${_formatTimeOfDay(_maxOperationTime)}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade700,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
             
             // Estado (solo en modo edición)
             if (_isEditMode) ...[

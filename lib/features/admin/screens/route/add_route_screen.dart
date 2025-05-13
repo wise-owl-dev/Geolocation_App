@@ -98,8 +98,9 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
       // Set values in controllers
       _nameController.text = route.name;
       if (route.description != null) _descriptionController.text = route.description!;
-      _startTimeController.text = route.startTime;
-      _endTimeController.text = route.endTime;
+      
+      _startTimeController.text = _formatTimeStringForDisplay(route.startTime);
+    _endTimeController.text = _formatTimeStringForDisplay(route.endTime);
       
       // Update selected days
       for (int i = 0; i < _availableDays.length; i++) {
@@ -115,8 +116,8 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
       final formNotifier = ref.read(addRouteFormProvider.notifier);
       formNotifier.onNameChanged(route.name);
       if (route.description != null) formNotifier.onDescriptionChanged(route.description!);
-      formNotifier.onStartTimeChanged(route.startTime);
-      formNotifier.onEndTimeChanged(route.endTime);
+      formNotifier.onStartTimeChanged(_formatTimeStringForDisplay(route.startTime));
+      formNotifier.onEndTimeChanged(_formatTimeStringForDisplay(route.endTime));
       formNotifier.onDaysChanged(route.days);
       formNotifier.onStatusChanged(route.status);
       
@@ -135,6 +136,18 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
       }
     }
   }
+  // Método auxiliar para formatear tiempo de HH:MM:SS a HH:MM para mostrar
+    String _formatTimeStringForDisplay(String timeStr) {
+      // Si el formato ya es HH:MM, devolverlo como está
+      if (!timeStr.contains(':')) return timeStr;
+      
+      // Si tiene formato HH:MM:SS, extraer HH:MM
+      final parts = timeStr.split(':');
+      if (parts.length >= 2) {
+        return '${parts[0]}:${parts[1]}';
+      }
+      return timeStr;
+    }
 
   // Method to show time picker
   Future<void> _selectTime(BuildContext context, bool isStartTime) async {
@@ -152,7 +165,7 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
     );
 
     if (picked != null) {
-      // Format time as HH:MM
+      // Formatear la hora seleccionada como HH:MM para la interfaz
       final formattedTime = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
       
       setState(() {
@@ -548,7 +561,14 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
                                 .where((day) => day['selected'])
                                 .map((day) => day['name'] as String)
                                 .toList();
-                            
+                            // Asegurar formato HH:MM:SS para la base de datos
+                            String formatTimeForDatabase(String timeStr) {
+                              // Si ya tiene el formato HH:MM:SS, devolverlo como está
+                              if (timeStr.split(':').length == 3) return timeStr;
+                              
+                              // Si tiene formato HH:MM, añadir :00 para segundos
+                              return '$timeStr:00';
+                            }
                             // In edit mode
                             if (_isEditMode && widget.routeId != null) {
                               print('Updating route: ${widget.routeId}');

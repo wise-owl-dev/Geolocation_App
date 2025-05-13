@@ -189,7 +189,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(width: 8),
             const Text(
-              'TransporteTrack',
+              'Autotransportes Zaachila-Yoo',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
