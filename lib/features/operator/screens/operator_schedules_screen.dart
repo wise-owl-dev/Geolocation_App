@@ -335,16 +335,10 @@ class _OperatorSchedulesScreenState extends ConsumerState<OperatorSchedulesScree
                           side: const BorderSide(color: Colors.green),
                         ),
                         onPressed: () {
-                          // Aquí iría la lógica para iniciar la ruta
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Iniciando ruta...'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                          // Navegar a la pantalla de mapa para el operador con esta asignación
+                          context.push('/operator/map/${assignment.id}');
                         },
                       ),
-                      
                     if (assignment.status == AssignmentStatus.en_curso) ...[
                       OutlinedButton.icon(
                         icon: const Icon(Icons.stop, size: 18),

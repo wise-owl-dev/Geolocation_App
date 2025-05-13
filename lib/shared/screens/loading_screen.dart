@@ -68,7 +68,7 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
             const SizedBox(height: 30),
             // Nombre de la aplicación
             const Text(
-              'TransporteTrack',
+              'Autotransportes',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,

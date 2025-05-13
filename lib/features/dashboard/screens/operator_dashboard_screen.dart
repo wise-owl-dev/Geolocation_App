@@ -12,6 +12,10 @@ class OperatorDashboardScreen extends ConsumerWidget {
     // Implementar navegación según la opción
     if (option == 'Ver Horarios') {
       context.push('/operator/schedules');
+    } else if (option == 'Ver Recorrido') {
+      context.push('/operator/route-selector');
+    } else if (option == 'Iniciar Ruta') {
+      context.push('/operator/route-tracking');
     }
     // Las demás opciones se implementarán posteriormente
   }
@@ -114,11 +118,11 @@ class OperatorDashboardScreen extends ConsumerWidget {
                     title: 'Ver Horarios',
                     onTap: () => _handleMenuOption(context, 'Ver Horarios'),
                   ),
-                  
                   _MenuOption(
                     icon: Icons.map_outlined,
                     title: 'Iniciar Ruta',
-                    onTap: () => _handleMenuOption(context, 'Iniciar Ruta'),
+                    badge: 'Nuevo',
+                    onTap: () => context.push('/operator/map'),
                   ),
                   _MenuOption(
                     icon: Icons.report_problem_outlined,

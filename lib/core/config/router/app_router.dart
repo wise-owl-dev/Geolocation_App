@@ -15,6 +15,9 @@ import '../../../features/admin/screens/route/route_stops_screen.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/auth/screens/login_screen.dart';
 import '../../../features/auth/screens/signup_screen.dart';
+import '../../../features/map/screens/bus_map_screen.dart';
+import '../../../features/map/screens/bus_tracking_screen.dart';
+import '../../../features/map/screens/operator_map_screen.dart';
 import '../../../features/operator/screens/operator_schedules_screen.dart';
 import '../../../features/user/screens/search_bus_screen.dart';
 import '../../../shared/screens/splash_screen.dart';
@@ -163,18 +166,39 @@ final routerProvider = Provider<GoRouter>((ref) {
           return AddAssignmentScreen(assignmentId: assignmentId);
         },
       ),
-
-
+      
       // Rutas de usuario
       GoRoute(
         path: '/user/bus-search',
         builder: (context, state) => const BusSearchScreen(),
-        ),
+      ),
+      GoRoute(
+        path: '/user/bus-map',
+        builder: (context, state) => const BusMapScreen(),
+      ),
+      GoRoute(
+        path: '/user/bus-tracking/:id',
+        builder: (context, state) {
+          final assignmentId = state.pathParameters['id']!;
+          return BusTrackingScreen(assignmentId: assignmentId);
+        },
+      ),
 
-       // Rutas de operador
+      // Rutas de operador
       GoRoute(
         path: '/operator/schedules',
         builder: (context, state) => const OperatorSchedulesScreen(),
+      ),
+      GoRoute(
+        path: '/operator/map',
+        builder: (context, state) => const OperatorMapScreen(),
+      ),
+      GoRoute(
+        path: '/operator/map/:id',
+        builder: (context, state) {
+          final assignmentId = state.pathParameters['id'];
+          return OperatorMapScreen(assignmentId: assignmentId);
+        },
       ),
     ],   
     

@@ -107,8 +107,8 @@ class UserDashboardScreen extends ConsumerWidget {
                   _MenuOption(
                     icon: Icons.directions_bus,
                     title: 'Rutas en Tiempo Real',
-                    //badge: 'Nuevo',
-                    onTap: () => _handleMenuOption(context, 'Rutas en Tiempo Real'),
+                    badge: 'Nuevo',
+                    onTap: () => context.push('/user/bus-map'),
                   ),
                   _MenuOption(
                     icon: Icons.calendar_today,
