@@ -33,7 +33,11 @@ class _OperatorMapScreenState extends ConsumerState<OperatorMapScreen> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (mounted) {
+      _loadData();
+    }
+  });
   }
 
   Future<void> _loadData() async {

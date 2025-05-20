@@ -1,3 +1,4 @@
+// lib/features/dashboard/screens/user_dashboard_screen.dart (actualizado)
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,10 @@ class UserDashboardScreen extends ConsumerWidget {
     // Implementar navegación según la opción
     if (option == 'Buscar Autobús') {
       context.push('/user/bus-search');
+    } else if (option == 'Rutas') {
+      context.push('/user/routes');
+    } else if (option == 'Paradas Cercanas') {
+      context.push('/user/nearby-stops');
     }
     // Las demás opciones se implementarán más adelante
   }
@@ -118,11 +123,11 @@ class UserDashboardScreen extends ConsumerWidget {
                   _MenuOption(
                     icon: Icons.map,
                     title: 'Paradas Cercanas',
-                    onTap: () => _handleMenuOption(context, 'Paradas'),
+                    onTap: () => _handleMenuOption(context, 'Paradas Cercanas'),
                   ),
                   _MenuOption(
                     icon: Icons.search,
-                    title: 'Buscar Autbus',
+                    title: 'Buscar Autobús',
                     onTap: () => _handleMenuOption(context, 'Buscar Autobús'),
                   ),
                 ],

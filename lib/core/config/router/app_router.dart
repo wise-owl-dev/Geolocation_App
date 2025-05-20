@@ -15,10 +15,15 @@ import '../../../features/admin/screens/route/route_stops_screen.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/auth/screens/login_screen.dart';
 import '../../../features/auth/screens/signup_screen.dart';
+import '../../../features/bus_stops/screens/nearby_stops_screen.dart';
+import '../../../features/bus_stops/screens/stop_details_screen.dart';
 import '../../../features/map/screens/bus_map_screen.dart';
 import '../../../features/map/screens/bus_tracking_screen.dart';
 import '../../../features/map/screens/operator_map_screen.dart';
+import '../../../features/map/screens/route_selector_screen.dart';
 import '../../../features/operator/screens/operator_schedules_screen.dart';
+import '../../../features/routes/screens/route_details_screen.dart';
+import '../../../features/routes/screens/routes_screen.dart';
 import '../../../features/user/screens/search_bus_screen.dart';
 import '../../../shared/screens/splash_screen.dart';
 import '../../../shared/screens/loading_screen.dart';
@@ -183,6 +188,32 @@ final routerProvider = Provider<GoRouter>((ref) {
           return BusTrackingScreen(assignmentId: assignmentId);
         },
       ),
+        GoRoute(
+        path: '/user/routes',
+        builder: (context, state) => const RoutesScreen(),
+      ),
+      GoRoute(
+        path: '/user/nearby-stops',
+        builder: (context, state) => const NearbyStopsScreen(),
+      ),
+
+      
+       // Rutas de detalles
+      GoRoute(
+        path: '/user/route-details/:id',
+        builder: (context, state) {
+          final routeId = state.pathParameters['id']!;
+          return RouteDetailsScreen(routeId: routeId);
+        },
+      ),
+      GoRoute(
+        path: '/user/stop-details/:id',
+        builder: (context, state) {
+          final stopId = state.pathParameters['id']!;
+          return StopDetailsScreen(stopId: stopId);
+        },
+      ),
+      
 
       // Rutas de operador
       GoRoute(
@@ -199,6 +230,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final assignmentId = state.pathParameters['id'];
           return OperatorMapScreen(assignmentId: assignmentId);
         },
+      ),
+      GoRoute(
+        path: '/operator/route-selector',
+        builder: (context, state) => const RouteSelectionScreen(),
       ),
     ],   
     

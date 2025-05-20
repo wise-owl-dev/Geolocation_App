@@ -6,14 +6,14 @@ import '../../auth/providers/auth_provider.dart';
 class OperatorDashboardScreen extends ConsumerWidget {
   const OperatorDashboardScreen({super.key});
 
-  void _handleMenuOption(BuildContext context, String option) {
+    void _handleMenuOption(BuildContext context, String option) {
     print('Navegando a: $option');
     
     // Implementar navegación según la opción
     if (option == 'Ver Horarios') {
       context.push('/operator/schedules');
     } else if (option == 'Ver Recorrido') {
-      context.push('/operator/route-selector');
+      context.push('/operator/route-selector'); // Esta ruta ahora está correctamente implementada
     } else if (option == 'Iniciar Ruta') {
       context.push('/operator/route-tracking');
     }
@@ -124,11 +124,13 @@ class OperatorDashboardScreen extends ConsumerWidget {
                     badge: 'Nuevo',
                     onTap: () => context.push('/operator/map'),
                   ),
+                  /*
                   _MenuOption(
                     icon: Icons.report_problem_outlined,
                     title: 'Reportar Incidente',
                     onTap: () => _handleMenuOption(context, 'Reportar Incidente'),
                   ),
+                  */
                   
                 ],
               ),
