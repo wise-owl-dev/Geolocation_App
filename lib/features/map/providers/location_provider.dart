@@ -145,43 +145,44 @@ class LocationNotifier extends StateNotifier<LocationState> {
 
   // Update location with new data and save to database
   Future<void> _updateLocation(LocationData locationData) async {
-    if (locationData.latitude == null || locationData.longitude == null || _assignmentId == null) {
-      return;
-    }
+  if (locationData.latitude == null || locationData.longitude == null || _assignmentId == null) {
+    return;
+  }
 
-    final newLocation = LatLng(
-      locationData.latitude!,
-      locationData.longitude!,
-    );
+  final newLocation = LatLng(
+    locationData.latitude!,
+    locationData.longitude!,
+  );
 
-    try {
-      // Save location to database
-      final result = await _supabase.from('ubicaciones').insert({
-        'asignacion_id': _assignmentId,
-        'latitud': newLocation.latitude,
-        'longitud': newLocation.longitude,
-        'velocidad': locationData.speed,
-        'timestamp': DateTime.now().toIso8601String(),
-      }).select();
+  try {
+    // Guardar ubicación en la base de datos
+    final result = await _supabase.from('ubicaciones').insert({
+      'asignacion_id': _assignmentId,
+      'latitud': newLocation.latitude,
+      'longitud': newLocation.longitude,
+      'velocidad': locationData.speed,
+      'timestamp': DateTime.now().toIso8601String(),
+      // No incluimos parada_actual_id y proxima_parada_id por ahora
+    }).select();
 
-      if (result.isNotEmpty) {
-        final savedLocation = custom_location.Location.fromJson(result[0]);
-        
-        // Update state with new location
-        state = state.copyWith(
-          currentLocation: newLocation,
-          lastLocation: savedLocation,
-          locationHistory: [...state.locationHistory, savedLocation],
-        );
-      }
-    } catch (e) {
-      print('Error saving location: $e');
-      // Update state with new location but don't save to history
+    if (result.isNotEmpty) {
+      final savedLocation = custom_location.Location.fromJson(result[0]);
+      
+      // Actualizar estado con nueva ubicación
       state = state.copyWith(
         currentLocation: newLocation,
+        lastLocation: savedLocation,
+        locationHistory: [...state.locationHistory, savedLocation],
       );
     }
+  } catch (e) {
+    print('Error saving location: $e');
+    // Actualizar estado con nueva ubicación pero sin guardar en el historial
+    state = state.copyWith(
+      currentLocation: newLocation,
+    );
   }
+}
 
   // Get location history for a specific assignment
   Future<void> fetchLocationHistory(String assignmentId) async {

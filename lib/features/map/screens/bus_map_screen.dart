@@ -1,4 +1,6 @@
 // lib/features/map/screens/bus_map_screen.dart
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,13 +23,21 @@ class BusMapScreen extends ConsumerStatefulWidget {
 
 class _BusMapScreenState extends ConsumerState<BusMapScreen> {
   @override
-  void initState() {
-    super.initState();
-    // Start loading data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(busTrackingProvider.notifier).refreshActiveBuses();
+void initState() {
+  super.initState();
+  // Iniciar carga de datos
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Cargar autobuses activos inmediatamente
+    ref.read(busTrackingProvider.notifier).refreshActiveBuses();
+    
+    // Configurar un temporizador para actualizar autobuses cada 10 segundos
+    Timer.periodic(const Duration(seconds: 10), (_) {
+      if (mounted) {
+        ref.read(busTrackingProvider.notifier).refreshActiveBuses();
+      }
     });
-  }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
