@@ -319,44 +319,44 @@ class MapNotifier extends StateNotifier<MapState> {
   }
 
   // Add a bus marker with rotation (for direction)
-  Future<void> addBusMarker({
-    required String id,
-    required LatLng position,
-    required String title,
-    String? snippet,
-    double rotation = 0.0,
-    double? speed,
-    String? busId,
-    String? routeId,
-    String? assignmentId,
-  }) async {
-    try {
-      // Load custom bus icon if needed
-      BitmapDescriptor icon = await _getBusIcon();
-      
-      final marker = CustomMapMarker(
-        id: id,
-        position: position,
-        title: title,
-        snippet: snippet ?? (speed != null ? '${speed.toStringAsFixed(1)} km/h' : null),
-        icon: icon,
-        type: MarkerType.bus,
-        busId: busId,
-        routeId: routeId,
-        assignmentId: assignmentId,
-        rotation: rotation,
-        speed: speed,
-        lastUpdated: DateTime.now(),
-      );
-      
-      final markers = {...state.markers};
-      markers[id] = marker;
-      
-      state = state.copyWith(markers: markers);
-    } catch (e) {
-      print('Error adding bus marker: $e');
-    }
+ Future<void> addBusMarker({
+  required String id,
+  required LatLng position,
+  required String title,
+  String? snippet,
+  double rotation = 0.0,
+  double? speed,
+  String? busId,
+  String? routeId,
+  String? assignmentId,
+}) async {
+  try {
+    // Cargar icono personalizado de autobús si es necesario
+    BitmapDescriptor icon = await _getBusIcon();
+    
+    final marker = CustomMapMarker(
+      id: id,
+      position: position,
+      title: title,
+      snippet: snippet ?? (speed != null ? '${speed.toStringAsFixed(1)} km/h' : null),
+      icon: icon,
+      type: MarkerType.bus,
+      busId: busId,
+      routeId: routeId,
+      assignmentId: assignmentId,
+      rotation: rotation,
+      speed: speed,
+      lastUpdated: DateTime.now(),
+    );
+    
+    final markers = {...state.markers};
+    markers[id] = marker;
+    
+    state = state.copyWith(markers: markers);
+  } catch (e) {
+    print('Error adding bus marker: $e');
   }
+}
 
   // Update bus marker position and rotation
   void updateBusMarker({
@@ -479,15 +479,22 @@ class MapNotifier extends StateNotifier<MapState> {
   
   // Get a custom icon for bus markers
   Future<BitmapDescriptor> _getBusIcon() async {
+  try {
+    // Intenta cargar el icono personalizado de autobús desde assets
     try {
-      // Try to load custom bus icon from assets (you'll need to add this)
       final Uint8List markerIcon = await _getBytesFromAsset('assets/images/bus_marker.png', 120);
       return BitmapDescriptor.fromBytes(markerIcon);
     } catch (e) {
-      // If custom icon fails, use default blue marker
+      print('Error loading custom bus icon, using default: $e');
+      // Si no se encuentra el archivo, usa un ícono por defecto
       return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
     }
+  } catch (e) {
+    // En caso de cualquier otro error, usa el marcador por defecto
+    print('Error creating bus icon: $e');
+    return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
   }
+}
   
   // Helper method to load asset as bytes
   Future<Uint8List> _getBytesFromAsset(String path, int width) async {

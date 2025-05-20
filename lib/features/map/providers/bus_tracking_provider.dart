@@ -114,103 +114,129 @@ class BusTrackingNotifier extends StateNotifier<BusTrackingState> {
 
   // Load buses that are currently active (have an active assignment)
   Future<void> refreshActiveBuses() async {
-    if (state.isLoading) return;
+  if (state.isLoading) return;
+  
+  state = state.copyWith(isLoading: true);
+  
+  try {
+    // Obtener todas las asignaciones activas
+    final assignmentResult = await _supabase
+        .from('asignaciones')
+        .select('''
+          *,
+          autobuses:autobus_id (*),
+          usuarios:operador_id (nombre, apellido_paterno),
+          recorridos:recorrido_id (nombre)
+        ''')
+        .or('estado.eq.programada,estado.eq.en_curso')  // Solo programadas o en curso
+        .lte('fecha_inicio', DateTime.now().toIso8601String())
+        .or('fecha_fin.is.null,fecha_fin.gte.${DateTime.now().toIso8601String()}');
     
-    state = state.copyWith(isLoading: true);
+    print('Found ${assignmentResult.length} active assignments');
     
-    try {
-      // Get all active assignments
-      final assignmentResult = await _supabase
-          .from('asignaciones')
-          .select('''
-            *,
-            autobuses:autobus_id (*),
-            usuarios:operador_id (nombre, apellido_paterno),
-            recorridos:recorrido_id (nombre)
-          ''')
-          .contains('estado', ['programada', 'en_curso'])
-          .lte('fecha_inicio', DateTime.now().toIso8601String())
-          .or('fecha_fin.is.null,fecha_fin.gte.${DateTime.now().toIso8601String()}');
-      
-      final Map<String, Assignment> assignments = {};
-      final Map<String, Bus> buses = {};
-      
-      for (var item in assignmentResult) {
-        try {
-          // Extract the related bus data
-          final busData = item['autobuses'];
-          final operatorData = item['usuarios'];
-          final routeData = item['recorridos'];
+    final Map<String, Assignment> assignments = {};
+    final Map<String, Bus> buses = {};
+    
+    for (var item in assignmentResult) {
+      try {
+        // Extraer los datos relacionados
+        final busData = item['autobuses'];
+        final operatorData = item['usuarios'];
+        final routeData = item['recorridos'];
+        
+        if (busData != null) {
+          final bus = Bus.fromJson(busData);
           
-          if (busData != null) {
-            final bus = Bus.fromJson(busData);
-            
-            // Create assignment with related data
-            final assignment = Assignment.fromJson(
-              item,
-              operatorName: operatorData != null 
-                  ? '${operatorData['nombre']} ${operatorData['apellido_paterno']}' 
-                  : null,
-              busNumber: bus.busNumber,
-              routeName: routeData != null ? routeData['nombre'] : null,
-            );
-            
-            assignments[assignment.id] = assignment;
-            buses[bus.id] = bus;
-            
-            // Start tracking this bus location if it's not already being tracked
-            if (!state.activeBuses.containsKey(bus.id)) {
-              _trackBusLocation(assignment.id, bus.id, bus.busNumber);
-            }
+          // Crear asignación con datos relacionados
+          final assignment = Assignment.fromJson(
+            item,
+            operatorName: operatorData != null 
+                ? '${operatorData['nombre']} ${operatorData['apellido_paterno']}' 
+                : null,
+            busNumber: bus.busNumber,
+            routeName: routeData != null ? routeData['nombre'] : null,
+          );
+          
+          assignments[assignment.id] = assignment;
+          buses[bus.id] = bus;
+          
+          // Solo comenzar a rastrear autobuses en estado "en_curso"
+          if (assignment.status == AssignmentStatus.en_curso) {
+            print('Tracking bus ${bus.busNumber} for assignment ${assignment.id} in status: ${assignment.status.name}');
+            _trackBusLocation(assignment.id, bus.id, bus.busNumber);
           }
-        } catch (e) {
-          print('Error processing assignment: $e');
         }
+      } catch (e) {
+        print('Error processing assignment: $e');
       }
-      
-      state = state.copyWith(
-        activeAssignments: assignments,
-        activeBuses: buses,
-        isLoading: false,
-      );
-      
-      // If we have a selected bus, make sure we still have its data
-      if (state.selectedBusId != null && !buses.containsKey(state.selectedBusId)) {
-        // Bus is no longer active, clear selection
-        clearSelectedBus();
-      }
-    } catch (e) {
-      state = state.copyWith(
-        error: 'Error loading active buses: $e',
-        isLoading: false,
-      );
     }
+    
+    state = state.copyWith(
+      activeAssignments: assignments,
+      activeBuses: buses,
+      isLoading: false,
+    );
+    
+    // Si tenemos un autobús seleccionado, asegurarnos de que aún tengamos sus datos
+    if (state.selectedBusId != null && !buses.containsKey(state.selectedBusId)) {
+      // El autobús ya no está activo, limpiar selección
+      clearSelectedBus();
+    }
+  } catch (e) {
+    print('Error loading active buses: $e');
+    state = state.copyWith(
+      error: 'Error loading active buses: $e',
+      isLoading: false,
+    );
   }
-
+}
   // Start tracking location updates for a specific bus
-  void _trackBusLocation(String assignmentId, String busId, String busNumber) {
-    // First try to fetch the last known location
-    _fetchLastLocation(assignmentId).then((lastLocation) {
-      if (lastLocation != null) {
-        _updateBusMarker(lastLocation, busId, busNumber, assignmentId);
-      }
-      
-      // Now set up real-time updates
-      _locationSubscription?.cancel();
-      _locationSubscription = _supabase
+ void _trackBusLocation(String assignmentId, String busId, String busNumber) {
+  print('Starting to track bus location for assignment: $assignmentId, bus: $busId');
+  // Primero intentar obtener la última ubicación conocida
+  _fetchLastLocation(assignmentId).then((lastLocation) {
+    if (lastLocation != null) {
+      print('Found last location for bus $busNumber: ${lastLocation.latitude}, ${lastLocation.longitude}');
+      _updateBusMarker(lastLocation, busId, busNumber, assignmentId);
+    } else {
+      print('No previous location found for bus $busNumber');
+    }
+    
+    // Ahora configurar actualizaciones en tiempo real
+    try {
+      print('Setting up real-time location updates for bus $busNumber');
+      final subscription = _supabase
           .from('ubicaciones')
           .stream(primaryKey: ['id'])
           .eq('asignacion_id', assignmentId)
           .order('timestamp', ascending: false)
           .limit(1)
-          .listen((data) {
-            if (data.isNotEmpty) {
-              final location = custom_location.Location.fromJson(data[0]);
-              _updateBusMarker(location, busId, busNumber, assignmentId);
-            }
-          });
-    });
-  }
+          .listen(
+            (data) {
+              if (data.isNotEmpty) {
+                print('Received real-time location update for bus $busNumber');
+                final location = custom_location.Location.fromJson(data[0]);
+                _updateBusMarker(location, busId, busNumber, assignmentId);
+              }
+            },
+            onError: (error) {
+              print('Error subscribing to bus location updates: $error');
+            },
+          );
+      
+      // Guardar la suscripción para cancelarla luego si es necesario
+      if (_individualTracking.containsKey(assignmentId)) {
+        print('Cancelling previous subscription for bus $busNumber');
+        _individualTracking[assignmentId]?.cancel();
+      }
+      _individualTracking[assignmentId] = subscription;
+    } catch (e) {
+      print('Error setting up location subscription: $e');
+    }
+  }).catchError((error) {
+    print('Error fetching last location: $error');
+  });
+}
 
   // Get the last known location for a bus
   Future<custom_location.Location?> _fetchLastLocation(String assignmentId) async {

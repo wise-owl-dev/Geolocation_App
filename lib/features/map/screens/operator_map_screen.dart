@@ -140,46 +140,49 @@ class _OperatorMapScreenState extends ConsumerState<OperatorMapScreen> {
   }
 
   Future<void> _startRoute() async {
-    if (_activeAssignment == null) return;
+  if (_activeAssignment == null) return;
+
+  setState(() {
+    _isLoading = true;
+    _error = null;
+  });
+
+  try {
+    // Solo iniciar el seguimiento si tenemos una asignación activa
+    // Actualizar el estado de la asignación a "en curso" en la base de datos
+    final supabase = Supabase.instance.client;
+    await supabase
+        .from('asignaciones')
+        .update({
+          'estado': 'en_curso',
+          'ultima_actualizacion': DateTime.now().toIso8601String(),  // Añadir timestamp
+        })
+        .eq('id', _activeAssignment!.id);
+
+    // Iniciar el seguimiento de ubicación
+    await ref.read(locationProvider.notifier).startTracking(_activeAssignment!.id);
 
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _isLoading = false;
+      _isStarted = true;
+      _isTrackingLocation = true;
     });
 
-    try {
-      // Only start tracking if we have an active assignment
-      // Update assignment status to "in progress" in database
-      final supabase = Supabase.instance.client;
-      await supabase
-          .from('asignaciones')
-          .update({'estado': 'en_curso'})
-          .eq('id', _activeAssignment!.id);
-
-      // Start tracking location
-      await ref.read(locationProvider.notifier).startTracking(_activeAssignment!.id);
-
-      setState(() {
-        _isLoading = false;
-        _isStarted = true;
-        _isTrackingLocation = true;
-      });
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Ruta iniciada! Tu ubicación se está compartiendo.'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _error = 'Error al iniciar la ruta: $e';
-      });
-      print('Error starting route: $e');
-    }
+    // Mostrar mensaje de éxito
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('¡Ruta iniciada! Tu ubicación se está compartiendo.'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  } catch (e) {
+    setState(() {
+      _isLoading = false;
+      _error = 'Error al iniciar la ruta: $e';
+    });
+    print('Error starting route: $e');
   }
+}
 
   Future<void> _completeRoute() async {
     if (_activeAssignment == null) return;
