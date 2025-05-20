@@ -23,21 +23,21 @@ class BusMapScreen extends ConsumerStatefulWidget {
 
 class _BusMapScreenState extends ConsumerState<BusMapScreen> {
   @override
-void initState() {
-  super.initState();
-  // Iniciar carga de datos
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    // Cargar autobuses activos inmediatamente
-    ref.read(busTrackingProvider.notifier).refreshActiveBuses();
-    
-    // Configurar un temporizador para actualizar autobuses cada 10 segundos
-    Timer.periodic(const Duration(seconds: 10), (_) {
-      if (mounted) {
-        ref.read(busTrackingProvider.notifier).refreshActiveBuses();
-      }
+  void initState() {
+    super.initState();
+    // Iniciar carga de datos
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Cargar autobuses activos inmediatamente
+      ref.read(busTrackingProvider.notifier).refreshActiveBuses();
+      
+      // Configurar un temporizador para actualizar autobuses cada 10 segundos
+      Timer.periodic(const Duration(seconds: 10), (_) {
+        if (mounted) {
+          ref.read(busTrackingProvider.notifier).refreshActiveBuses();
+        }
+      });
     });
-  });
-}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,13 +106,24 @@ void initState() {
               ),
             ),
           
-          // Active buses panel at the bottom
+          // Active buses panel at the bottom - SOLO SI HAY AUTOBUSES ACTIVOS
           if (busTrackingState.activeBuses.isNotEmpty && busTrackingState.selectedBusId == null)
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: _buildActiveBusesPanel(busTrackingState),
+            ),
+            
+          // Mensaje cuando no hay autobuses activos
+          if (busTrackingState.activeBuses.isEmpty && 
+              !busTrackingState.isLoading && 
+              busTrackingState.selectedBusId == null)
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: _buildNoBusesPanel(),
             ),
           
           // Selected bus info panel
@@ -147,6 +158,71 @@ void initState() {
         },
         child: const Icon(Icons.info_outline),
         tooltip: 'Ver leyenda',
+      ),
+    );
+  }
+
+  // Nuevo widget para mostrar cuando no hay autobuses activos
+  Widget _buildNoBusesPanel() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.info_outline,
+              color: Colors.blue.shade700,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'No hay autobuses activos',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'No se encontraron rutas en funcionamiento en este momento.',
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Actualizar',
+            onPressed: () {
+              ref.read(busTrackingProvider.notifier).refreshActiveBuses();
+            },
+          ),
+        ],
       ),
     );
   }
@@ -225,14 +301,28 @@ void initState() {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               itemCount: state.activeBuses.length,
               itemBuilder: (context, index) {
-                final busId = state.activeBuses.keys.elementAt(index);
-                final bus = state.activeBuses[busId]!;
+                // Verificar que hay elementos antes de acceder
+                if (state.activeBuses.isEmpty) {
+                  return const SizedBox.shrink();
+                }
                 
-                // Find the assignment for this bus
-                final assignment = state.activeAssignments.values.firstWhere(
-                  (a) => a.busId == busId,
-                  orElse: () => throw Exception('No assignment found for bus $busId'),
-                );
+                final busId = state.activeBuses.keys.elementAt(index);
+                final bus = state.activeBuses[busId];
+                
+                // Verificar que el bus existe
+                if (bus == null) {
+                  return const SizedBox.shrink();
+                }
+                
+                // Find the assignment for this bus - con manejo seguro de nulos
+                final assignment = state.activeAssignments.values
+                    .where((a) => a.busId == busId)
+                    .firstOrNull; // Usar firstOrNull en lugar de firstWhere
+                
+                // Si no hay asignación, no mostrar este autobús
+                if (assignment == null) {
+                  return const SizedBox.shrink();
+                }
                 
                 // Get last location if available
                 final lastLocation = state.lastLocations[assignment.id];
@@ -371,6 +461,17 @@ void initState() {
   }
 
   void _showAllBusesDialog(BuildContext context, BusTrackingState state) {
+    // Si no hay autobuses activos, mostrar mensaje y no abrir el diálogo
+    if (state.activeBuses.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No hay autobuses activos en este momento'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -382,14 +483,28 @@ void initState() {
             shrinkWrap: true,
             separatorBuilder: (context, index) => const Divider(),
             itemBuilder: (context, index) {
-              final busId = state.activeBuses.keys.elementAt(index);
-              final bus = state.activeBuses[busId]!;
+              // Verificar que hay elementos antes de acceder
+              if (state.activeBuses.isEmpty) {
+                return const SizedBox.shrink();
+              }
               
-              // Find the assignment for this bus
-              final assignment = state.activeAssignments.values.firstWhere(
-                (a) => a.busId == busId,
-                orElse: () => throw Exception('No assignment found for bus $busId'),
-              );
+              final busId = state.activeBuses.keys.elementAt(index);
+              final bus = state.activeBuses[busId];
+              
+              // Verificar que el bus existe
+              if (bus == null) {
+                return const SizedBox.shrink();
+              }
+              
+              // Find the assignment for this bus - con manejo seguro de nulos
+              final assignment = state.activeAssignments.values
+                  .where((a) => a.busId == busId)
+                  .firstOrNull; // Usar firstOrNull en lugar de firstWhere
+                
+              // Si no hay asignación, no mostrar este autobús
+              if (assignment == null) {
+                return const SizedBox.shrink();
+              }
               
               return ListTile(
                 leading: CircleAvatar(
