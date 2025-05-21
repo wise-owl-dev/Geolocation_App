@@ -52,6 +52,7 @@ class LocationNotifier extends StateNotifier<LocationState> {
   final Location _location = Location();
   StreamSubscription<LocationData>? _locationSubscription;
   String? _assignmentId;
+  Timer? _periodicLocationUpdateTimer;
 
   LocationNotifier() : super(LocationState()) {
     _initLocationService();
@@ -96,14 +97,12 @@ class LocationNotifier extends StateNotifier<LocationState> {
       );
 
       // Get current location once
-      final locationData = await _location.getLocation();
-      final currentLocation = LatLng(
-        locationData.latitude!,
-        locationData.longitude!,
-      );
+      await _updateCurrentLocation();
+      
+      // Set up periodic location updates even when not actively tracking
+      _setupPeriodicLocationUpdates();
 
       state = state.copyWith(
-        currentLocation: currentLocation,
         hasPermission: true,
         isLoading: false,
       );
@@ -112,6 +111,46 @@ class LocationNotifier extends StateNotifier<LocationState> {
         error: 'Error al inicializar la ubicación: $e',
         isLoading: false,
       );
+    }
+  }
+  
+  // Setup periodic location updates
+  void _setupPeriodicLocationUpdates() {
+    // Cancel existing timer if any
+    _periodicLocationUpdateTimer?.cancel();
+    
+    // Update location every 30 seconds
+    _periodicLocationUpdateTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _updateCurrentLocation();
+    });
+  }
+  
+  // Update current location without starting tracking
+  Future<void> _updateCurrentLocation() async {
+    try {
+      final locationData = await _location.getLocation();
+      if (locationData.latitude != null && locationData.longitude != null) {
+        final currentLocation = LatLng(
+          locationData.latitude!,
+          locationData.longitude!,
+        );
+        
+        state = state.copyWith(currentLocation: currentLocation);
+        print('Current location updated: ${currentLocation.latitude}, ${currentLocation.longitude}');
+      }
+    } catch (e) {
+      print('Error updating current location: $e');
+    }
+  }
+  
+  // Force update current location and return it
+  Future<LatLng?> getCurrentLocation() async {
+    try {
+      await _updateCurrentLocation();
+      return state.currentLocation;
+    } catch (e) {
+      print('Error getting current location: $e');
+      return null;
     }
   }
 
@@ -145,44 +184,44 @@ class LocationNotifier extends StateNotifier<LocationState> {
 
   // Update location with new data and save to database
   Future<void> _updateLocation(LocationData locationData) async {
-  if (locationData.latitude == null || locationData.longitude == null || _assignmentId == null) {
-    return;
-  }
+    if (locationData.latitude == null || locationData.longitude == null || _assignmentId == null) {
+      return;
+    }
 
-  final newLocation = LatLng(
-    locationData.latitude!,
-    locationData.longitude!,
-  );
+    final newLocation = LatLng(
+      locationData.latitude!,
+      locationData.longitude!,
+    );
 
-  try {
-    // Guardar ubicación en la base de datos
-    final result = await _supabase.from('ubicaciones').insert({
-      'asignacion_id': _assignmentId,
-      'latitud': newLocation.latitude,
-      'longitud': newLocation.longitude,
-      'velocidad': locationData.speed,
-      'timestamp': DateTime.now().toIso8601String(),
-      // No incluimos parada_actual_id y proxima_parada_id por ahora
-    }).select();
+    try {
+      // Guardar ubicación en la base de datos
+      final result = await _supabase.from('ubicaciones').insert({
+        'asignacion_id': _assignmentId,
+        'latitud': newLocation.latitude,
+        'longitud': newLocation.longitude,
+        'velocidad': locationData.speed,
+        'timestamp': DateTime.now().toIso8601String(),
+        // No incluimos parada_actual_id y proxima_parada_id por ahora
+      }).select();
 
-    if (result.isNotEmpty) {
-      final savedLocation = custom_location.Location.fromJson(result[0]);
-      
-      // Actualizar estado con nueva ubicación
+      if (result.isNotEmpty) {
+        final savedLocation = custom_location.Location.fromJson(result[0]);
+        
+        // Actualizar estado con nueva ubicación
+        state = state.copyWith(
+          currentLocation: newLocation,
+          lastLocation: savedLocation,
+          locationHistory: [...state.locationHistory, savedLocation],
+        );
+      }
+    } catch (e) {
+      print('Error saving location: $e');
+      // Actualizar estado con nueva ubicación pero sin guardar en el historial
       state = state.copyWith(
         currentLocation: newLocation,
-        lastLocation: savedLocation,
-        locationHistory: [...state.locationHistory, savedLocation],
       );
     }
-  } catch (e) {
-    print('Error saving location: $e');
-    // Actualizar estado con nueva ubicación pero sin guardar en el historial
-    state = state.copyWith(
-      currentLocation: newLocation,
-    );
   }
-}
 
   // Get location history for a specific assignment
   Future<void> fetchLocationHistory(String assignmentId) async {
@@ -241,6 +280,7 @@ class LocationNotifier extends StateNotifier<LocationState> {
   @override
   void dispose() {
     _locationSubscription?.cancel();
+    _periodicLocationUpdateTimer?.cancel();
     super.dispose();
   }
 }

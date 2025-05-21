@@ -22,6 +22,9 @@ class BusMapScreen extends ConsumerStatefulWidget {
 }
 
 class _BusMapScreenState extends ConsumerState<BusMapScreen> {
+  GoogleMapController? _mapController;
+  bool _isLocating = false;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +40,67 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
         }
       });
     });
+  }
+
+  // Nuevo método para ir a la ubicación del usuario
+  Future<void> _goToMyLocation() async {
+    setState(() {
+      _isLocating = true;
+    });
+
+    try {
+      // Forzar actualización de la ubicación actual
+      final currentLocation = await ref.read(locationProvider.notifier).getCurrentLocation();
+      
+      if (currentLocation != null && _mapController != null) {
+        // Usar el controlador directamente para mayor control
+        await _mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: currentLocation,
+              zoom: 16.0,
+            ),
+          ),
+        );
+        
+        // Mostrar indicador de éxito
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ubicación actual encontrada'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        // Mostrar error si no se pudo obtener la ubicación
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No se pudo obtener tu ubicación actual. Verifica los permisos de ubicación.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error going to current location: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al obtener ubicación: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLocating = false;
+        });
+      }
+    }
   }
 
   @override
@@ -68,19 +132,17 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
               ref.read(busTrackingProvider.notifier).refreshActiveBuses();
             },
           ),
-          if (locationState.currentLocation != null)
-            IconButton(
-              icon: const Icon(Icons.my_location),
-              tooltip: 'Ir a mi ubicación',
-              onPressed: () {
-                if (locationState.currentLocation != null) {
-                  ref.read(mapProvider.notifier).moveCamera(
-                    locationState.currentLocation!,
-                    zoom: 16.0,
-                  );
-                }
-              },
-            ),
+          // Botón de ubicación modificado
+          IconButton(
+            icon: _isLocating 
+                ? const CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.0,
+                  )
+                : const Icon(Icons.my_location),
+            tooltip: 'Ir a mi ubicación',
+            onPressed: _isLocating ? null : _goToMyLocation,
+          ),
         ],
       ),
       body: Stack(
@@ -245,6 +307,8 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
       compassEnabled: true,
       mapType: MapType.normal,
       onMapCreated: (controller) {
+        // Guardar una referencia local al controlador
+        _mapController = controller;
         ref.read(mapProvider.notifier).onMapCreated(controller);
       },
       onCameraMove: (position) {

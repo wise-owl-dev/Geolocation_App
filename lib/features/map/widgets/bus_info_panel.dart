@@ -5,7 +5,7 @@ import '../../../shared/models/bus.dart';
 import '../../../shared/models/assignment.dart';
 import '../../../shared/models/location.dart' as custom_location;
 
-class BusInfoPanel extends StatelessWidget {
+class BusInfoPanel extends StatefulWidget {
   final Bus bus;
   final Assignment assignment;
   final custom_location.Location? lastLocation;
@@ -18,6 +18,40 @@ class BusInfoPanel extends StatelessWidget {
     this.lastLocation,
     required this.onClose,
   }) : super(key: key);
+
+  @override
+  State<BusInfoPanel> createState() => _BusInfoPanelState();
+}
+
+class _BusInfoPanelState extends State<BusInfoPanel> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isExpanded = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,18 +74,45 @@ class BusInfoPanel extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Handle for dragging
-          Container(
-            margin: const EdgeInsets.only(top: 8),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(2),
+          GestureDetector(
+            onTap: _toggleExpanded,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _isExpanded ? 'Contraer' : 'Expandir',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      Icon(
+                        _isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
+                        size: 16,
+                        color: Colors.grey.shade600,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           // Header with bus number and close button
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+            padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
             child: Row(
               children: [
                 CircleAvatar(
@@ -64,15 +125,15 @@ class BusInfoPanel extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Unidad ${bus.busNumber}',
+                        'Unidad ${widget.bus.busNumber}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
                       ),
-                      if (assignment.routeName != null)
+                      if (widget.assignment.routeName != null)
                         Text(
-                          'Ruta: ${assignment.routeName}',
+                          'Ruta: ${widget.assignment.routeName}',
                           style: TextStyle(
                             color: Colors.grey.shade700,
                           ),
@@ -82,102 +143,169 @@ class BusInfoPanel extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
-                  onPressed: onClose,
+                  onPressed: widget.onClose,
                   tooltip: 'Cerrar panel',
                 ),
               ],
             ),
           ),
-          // Bus details
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // Bus info
-                _buildInfoSection(
-                  title: 'Información del Autobús',
-                  children: [
-                    _buildInfoRow(
-                      icon: Icons.directions_bus,
-                      label: 'Placa',
-                      value: bus.licensePlate,
-                    ),
-                    _buildInfoRow(
-                      icon: Icons.people,
-                      label: 'Capacidad',
-                      value: '${bus.capacity} pasajeros',
-                    ),
-                    _buildInfoRow(
-                      icon: Icons.directions_car,
-                      label: 'Vehículo',
-                      value: '${bus.brand} ${bus.model} ${bus.year}',
-                    ),
-                    _buildInfoRow(
-                      icon: Icons.offline_bolt,
-                      label: 'Estado',
-                      value: _formatStatus(bus.status),
-                      valueColor: _getStatusColor(bus.status),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                
-                // Assignment info
-                _buildInfoSection(
-                  title: 'Información del Servicio',
-                  children: [
-                    _buildInfoRow(
-                      icon: Icons.schedule,
-                      label: 'Horario',
-                      value: _formatTimeRange(assignment),
-                    ),
-                    _buildInfoRow(
-                      icon: Icons.calendar_today,
-                      label: 'Fecha',
-                      value: _formatDateRange(assignment),
-                    ),
-                    if (assignment.operatorName != null)
-                      _buildInfoRow(
-                        icon: Icons.person,
-                        label: 'Conductor',
-                        value: assignment.operatorName!,
-                      ),
-                    _buildInfoRow(
-                      icon: Icons.flag,
-                      label: 'Estado',
-                      value: _formatAssignmentStatus(assignment.status),
-                      valueColor: assignment.status.color,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                
-                // Location info if available
-                if (lastLocation != null)
-                  _buildInfoSection(
-                    title: 'Información de Ubicación',
-                    children: [
-                      _buildInfoRow(
-                        icon: Icons.access_time,
-                        label: 'Última actualización',
-                        value: _formatLastUpdate(lastLocation!.timestamp),
-                      ),
-                      if (lastLocation!.speed != null)
-                        _buildInfoRow(
-                          icon: Icons.speed,
-                          label: 'Velocidad',
-                          value: '${lastLocation!.speed!.toStringAsFixed(1)} km/h',
-                        ),
-                      _buildInfoRow(
-                        icon: Icons.location_on,
-                        label: 'Coordenadas',
-                        value: '${lastLocation!.latitude.toStringAsFixed(6)}, ${lastLocation!.longitude.toStringAsFixed(6)}',
-                      ),
-                    ],
+          
+          // Bus location info (always visible)
+          if (widget.lastLocation != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  _buildQuickInfoItem(
+                    icon: Icons.speed,
+                    label: 'Velocidad',
+                    value: widget.lastLocation!.speed != null 
+                        ? '${widget.lastLocation!.speed!.toStringAsFixed(1)} km/h'
+                        : 'N/A',
                   ),
+                  const SizedBox(width: 16),
+                  _buildQuickInfoItem(
+                    icon: Icons.access_time,
+                    label: 'Última actualización',
+                    value: _formatLastUpdate(widget.lastLocation!.timestamp),
+                  ),
+                ],
+              ),
+            ),
+          
+          // Expandable details
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: _isExpanded
+                ? _buildExpandedDetails()
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildQuickInfoItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.blue.shade50,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: Colors.blue.shade700),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpandedDetails() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          // Bus info
+          _buildInfoSection(
+            title: 'Información del Autobús',
+            children: [
+              _buildInfoRow(
+                icon: Icons.directions_bus,
+                label: 'Placa',
+                value: widget.bus.licensePlate,
+              ),
+              _buildInfoRow(
+                icon: Icons.people,
+                label: 'Capacidad',
+                value: '${widget.bus.capacity} pasajeros',
+              ),
+              _buildInfoRow(
+                icon: Icons.directions_car,
+                label: 'Vehículo',
+                value: '${widget.bus.brand} ${widget.bus.model} ${widget.bus.year}',
+              ),
+              _buildInfoRow(
+                icon: Icons.offline_bolt,
+                label: 'Estado',
+                value: _formatStatus(widget.bus.status),
+                valueColor: _getStatusColor(widget.bus.status),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          // Assignment info
+          _buildInfoSection(
+            title: 'Información del Servicio',
+            children: [
+              _buildInfoRow(
+                icon: Icons.schedule,
+                label: 'Horario',
+                value: _formatTimeRange(widget.assignment),
+              ),
+              _buildInfoRow(
+                icon: Icons.calendar_today,
+                label: 'Fecha',
+                value: _formatDateRange(widget.assignment),
+              ),
+              if (widget.assignment.operatorName != null)
+                _buildInfoRow(
+                  icon: Icons.person,
+                  label: 'Conductor',
+                  value: widget.assignment.operatorName!,
+                ),
+              _buildInfoRow(
+                icon: Icons.flag,
+                label: 'Estado',
+                value: _formatAssignmentStatus(widget.assignment.status),
+                valueColor: widget.assignment.status.color,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          // Detailed Location info if available
+          if (widget.lastLocation != null)
+            _buildInfoSection(
+              title: 'Información de Ubicación',
+              children: [
+                _buildInfoRow(
+                  icon: Icons.location_on,
+                  label: 'Coordenadas',
+                  value: '${widget.lastLocation!.latitude.toStringAsFixed(6)}, ${widget.lastLocation!.longitude.toStringAsFixed(6)}',
+                ),
               ],
             ),
-          ),
         ],
       ),
     );
@@ -303,13 +431,13 @@ class BusInfoPanel extends StatelessWidget {
     final difference = now.difference(timestamp);
     
     if (difference.inMinutes < 1) {
-      return 'Hace ${difference.inSeconds} segundos';
+      return 'Hace ${difference.inSeconds} seg';
     } else if (difference.inHours < 1) {
-      return 'Hace ${difference.inMinutes} minutos';
+      return 'Hace ${difference.inMinutes} min';
     } else if (difference.inDays < 1) {
-      return 'Hace ${difference.inHours} horas';
+      return 'Hace ${difference.inHours} hrs';
     } else {
-      return DateFormat('dd/MM/yyyy HH:mm').format(timestamp);
+      return DateFormat('dd/MM HH:mm').format(timestamp);
     }
   }
 }
