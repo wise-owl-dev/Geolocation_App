@@ -85,10 +85,14 @@ class RouteCard extends StatelessWidget {
                     color: Colors.grey.shade600,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    'Días: ${_formatOperationDays(route.days)}',
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
+                  Expanded(  // Añadir Expanded para controlar el ancho
+                    child: Text(
+                      'Días: ${_formatOperationDays(route.days)}',
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                      ),
+                      maxLines: 1,  // Limitar a una línea
+                      overflow: TextOverflow.ellipsis,  // Añadir puntos suspensivos si es muy largo
                     ),
                   ),
                 ],
@@ -100,40 +104,58 @@ class RouteCard extends StatelessWidget {
     );
   }
 
-  String _formatOperationDays(List<String> days) {
-    if (days.isEmpty) return 'No disponible';
-    
-    // Ordenar días de la semana
-    const dayOrder = {
-      'lunes': 0, 'martes': 1, 'miércoles': 2, 'miercoles': 2,
-      'jueves': 3, 'viernes': 4, 'sábado': 5, 'sabado': 5, 'domingo': 6
-    };
-    
-    days.sort((a, b) {
-      final aIndex = dayOrder[a.toLowerCase()] ?? 7;
-      final bIndex = dayOrder[b.toLowerCase()] ?? 7;
-      return aIndex.compareTo(bIndex);
-    });
-    
-    // Capitalizar primera letra
-    final formattedDays = days.map((day) {
-      if (day.isEmpty) return day;
-      return day[0].toUpperCase() + day.substring(1).toLowerCase();
-    }).toList();
-    
-    // Si tiene todos los días de L-V, simplificar
-    final weekdaySet = {'Lunes', 'Martes', 'Miércoles', 'Miercoles', 'Jueves', 'Viernes'};
-    final daySet = formattedDays.toSet();
-    
-    if (weekdaySet.difference(daySet).isEmpty && daySet.containsAll(weekdaySet)) {
-      // Si también tiene S-D, es toda la semana
-      if (daySet.contains('Sábado') || daySet.contains('Sabado') && daySet.contains('Domingo')) {
-        return 'Todos los días';
+ String _formatOperationDays(List<String> days) {
+  if (days.isEmpty) return 'No disponible';
+  
+  // Mapeo de nombres completos a abreviaturas
+  const Map<String, String> abbrevs = {
+    'lunes': 'L', 'martes': 'M', 'miércoles': 'X', 'miercoles': 'X',
+    'jueves': 'J', 'viernes': 'V', 'sábado': 'S', 'sabado': 'S', 'domingo': 'D'
+  };
+  
+  // Ordenar días de la semana
+  const dayOrder = {
+    'lunes': 0, 'martes': 1, 'miércoles': 2, 'miercoles': 2,
+    'jueves': 3, 'viernes': 4, 'sábado': 5, 'sabado': 5, 'domingo': 6
+  };
+  
+  days.sort((a, b) {
+    final aIndex = dayOrder[a.toLowerCase()] ?? 7;
+    final bIndex = dayOrder[b.toLowerCase()] ?? 7;
+    return aIndex.compareTo(bIndex);
+  });
+  
+  // Si tiene todos los días de L-V, simplificar
+  final weekdaySet = {'lunes', 'martes', 'miércoles', 'miercoles', 'jueves', 'viernes'};
+  final daySetLower = days.map((d) => d.toLowerCase()).toSet();
+  
+  if (weekdaySet.difference(daySetLower).isEmpty && daySetLower.containsAll(weekdaySet)) {
+    // Si también tiene S-D, es toda la semana
+    if (daySetLower.contains('sábado') || daySetLower.contains('sabado') && daySetLower.contains('domingo')) {
+      return 'Todos los días';
+    }
+    return 'L-V';  // Formato más compacto
+  }
+
+  // De lo contrario, usar abreviaturas con guiones cuando son consecutivos
+  List<String> abbr = days.map((day) => abbrevs[day.toLowerCase()] ?? day).toList();
+  
+  // Verificar si hay secuencias consecutivas para usar guiones
+  if (abbr.length > 2) {
+    bool allConsecutive = true;
+    for (int i = 1; i < abbr.length; i++) {
+      if (dayOrder[days[i-1].toLowerCase()]! + 1 != dayOrder[days[i].toLowerCase()]!) {
+        allConsecutive = false;
+        break;
       }
-      return 'Lunes a Viernes';
     }
     
-    // De lo contrario, listar los días
-    return formattedDays.join(', ');
+    if (allConsecutive) {
+      return '${abbr.first}-${abbr.last}';  // Por ejemplo: L-V
+    }
   }
+  
+  // Si no son consecutivos, unir con comas
+  return abbr.join(', ');
+}
 }
