@@ -13,7 +13,7 @@ class LastName extends FormzInput<String, LastNameError> {
   const LastName.pure() : super.pure('');
 
   // Constructor para valor modificado
-  const LastName.dirty(String value) : super.dirty(value);
+  const LastName.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

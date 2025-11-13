@@ -14,7 +14,7 @@ class LicensePlate extends FormzInput<String, LicensePlateError> {
   const LicensePlate.pure() : super.pure('');
 
   // Constructor for modified value
-  const LicensePlate.dirty(String value) : super.dirty(value);
+  const LicensePlate.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

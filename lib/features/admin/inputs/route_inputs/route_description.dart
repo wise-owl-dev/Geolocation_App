@@ -9,7 +9,7 @@ class RouteDescription extends FormzInput<String, RouteDescriptionError> {
   const RouteDescription.pure() : super.pure('');
 
   // Constructor for modified value
-  const RouteDescription.dirty(String value) : super.dirty(value);
+  const RouteDescription.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

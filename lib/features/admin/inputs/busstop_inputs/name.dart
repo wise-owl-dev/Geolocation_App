@@ -9,7 +9,7 @@ class BusStopName extends FormzInput<String, BusStopNameError> {
   const BusStopName.pure() : super.pure('');
 
   // Constructor for modified value
-  const BusStopName.dirty(String value) : super.dirty(value);
+  const BusStopName.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

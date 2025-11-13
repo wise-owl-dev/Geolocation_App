@@ -7,7 +7,7 @@ import '../providers/map_provider.dart';
 import '../../../shared/models/route.dart' as app_route;
 
 class RouteSelectionScreen extends ConsumerStatefulWidget {
-  const RouteSelectionScreen({Key? key}) : super(key: key);
+  const RouteSelectionScreen({super.key});
 
   @override
   ConsumerState<RouteSelectionScreen> createState() => _RouteSelectionScreenState();

@@ -11,9 +11,9 @@ class AddRouteScreen extends ConsumerStatefulWidget {
   final String? routeId;
   
   const AddRouteScreen({
-    Key? key, 
+    super.key, 
     this.routeId,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<AddRouteScreen> createState() => _AddRouteScreenState();
@@ -410,7 +410,7 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
                       dense: true,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 0),
                     );
-                  }).toList(),
+                  }),
                   
                   // Show error message if no day is selected
                   if (routeForm.isFormPosted && routeForm.days.errorMessage != null)

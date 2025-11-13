@@ -26,9 +26,9 @@ class RouteStopsScreen extends ConsumerStatefulWidget {
   final String routeId;
   
   const RouteStopsScreen({
-    Key? key,
+    super.key,
     required this.routeId,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<RouteStopsScreen> createState() => _RouteStopsScreenState();

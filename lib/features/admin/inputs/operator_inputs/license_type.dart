@@ -14,7 +14,7 @@ class LicenseType extends FormzInput<String, LicenseTypeError> {
   const LicenseType.pure() : super.pure('');
 
   // Constructor para valor modificado
-  const LicenseType.dirty(String value) : super.dirty(value);
+  const LicenseType.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

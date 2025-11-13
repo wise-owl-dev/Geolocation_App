@@ -14,12 +14,12 @@ class AddAssignmentScreen extends ConsumerStatefulWidget {
   final String? preselectedRouteId;
   
   const AddAssignmentScreen({
-    Key? key,
+    super.key,
     this.assignmentId,
     this.preselectedOperatorId,
     this.preselectedBusId,
     this.preselectedRouteId,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<AddAssignmentScreen> createState() => _AddAssignmentScreenState();
@@ -756,7 +756,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.person),
               ),
-              value: _selectedOperatorId,
+              initialValue: _selectedOperatorId,
               items: _operators.map((op) {
                 final fullName = '${op['nombre']} ${op['apellido_paterno'] ?? ''} ${op['apellido_materno'] ?? ''}'.trim();
                 return DropdownMenuItem<String>(
@@ -785,7 +785,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.directions_bus),
               ),
-              value: _selectedBusId,
+              initialValue: _selectedBusId,
               items: _buses.map((bus) {
                 return DropdownMenuItem<String>(
                   value: bus['id'],
@@ -813,7 +813,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.route),
               ),
-              value: _selectedRouteId,
+              initialValue: _selectedRouteId,
               items: _routes.map((route) {
                 return DropdownMenuItem<String>(
                   value: route['id'],

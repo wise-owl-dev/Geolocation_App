@@ -13,7 +13,7 @@ class Phone extends FormzInput<String, PhoneError> {
   const Phone.pure() : super.pure('');
 
   // Constructor para valor modificado
-  const Phone.dirty(String value) : super.dirty(value);
+  const Phone.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

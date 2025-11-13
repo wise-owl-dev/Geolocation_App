@@ -13,7 +13,7 @@ class Year extends FormzInput<String, YearError> {
   const Year.pure() : super.pure('');
 
   // Constructor for modified value
-  const Year.dirty(String value) : super.dirty(value);
+  const Year.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;
@@ -33,8 +33,9 @@ class Year extends FormzInput<String, YearError> {
     
     final intValue = int.tryParse(value);
     final currentYear = DateTime.now().year;
-    if (intValue == null || intValue < 1950 || intValue > currentYear) 
+    if (intValue == null || intValue < 1950 || intValue > currentYear) {
       return YearError.invalid;
+    }
 
     return null;
   }

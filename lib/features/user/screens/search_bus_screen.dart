@@ -6,7 +6,7 @@ import '../../../shared/models/bus.dart';
 import '../../../shared/widgets/widgets.dart';
 
 class BusSearchScreen extends ConsumerStatefulWidget {
-  const BusSearchScreen({Key? key}) : super(key: key);
+  const BusSearchScreen({super.key});
 
   @override
   ConsumerState<BusSearchScreen> createState() => _BusSearchScreenState();

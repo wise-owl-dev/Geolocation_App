@@ -10,11 +10,11 @@ class BusStopCard extends ConsumerWidget {
   final VoidCallback onTap;
 
   const BusStopCard({
-    Key? key,
+    super.key,
     required this.busStop,
     required this.distance,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

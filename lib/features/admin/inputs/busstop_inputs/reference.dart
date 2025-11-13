@@ -9,7 +9,7 @@ class Reference extends FormzInput<String, ReferenceError> {
   const Reference.pure() : super.pure('');
 
   // Constructor for modified value
-  const Reference.dirty(String value) : super.dirty(value);
+  const Reference.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

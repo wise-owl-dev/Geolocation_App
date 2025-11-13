@@ -14,7 +14,7 @@ class StartTime extends FormzInput<String, StartTimeError> {
   const StartTime.pure() : super.pure('');
 
   // Constructor for modified value
-  const StartTime.dirty(String value) : super.dirty(value);
+  const StartTime.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

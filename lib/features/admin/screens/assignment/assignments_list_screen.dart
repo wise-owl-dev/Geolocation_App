@@ -8,7 +8,7 @@ import '../../../../shared/models/assignment.dart';
 import '../../../../shared/widgets/widgets.dart';
 
 class AssignmentsListScreen extends ConsumerStatefulWidget {
-  const AssignmentsListScreen({Key? key}) : super(key: key);
+  const AssignmentsListScreen({super.key});
 
   @override
   ConsumerState<AssignmentsListScreen> createState() => _AssignmentsListScreenState();
@@ -261,7 +261,7 @@ class _AssignmentsListScreenState extends ConsumerState<AssignmentsListScreen> {
             : 'Indefinido';
         
         // Formatear horas
-        final timeFormat = (time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+        String timeFormat(time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
         final timeRange = '${timeFormat(assignment.startTime)} - ${timeFormat(assignment.endTime)}';
         
         return Card(

@@ -5,7 +5,7 @@ import 'dart:async';
 import '../../features/auth/providers/auth_provider.dart';
 
 class LoadingScreen extends ConsumerStatefulWidget {
-  const LoadingScreen({Key? key}) : super(key: key);
+  const LoadingScreen({super.key});
 
   @override
   _LoadingScreenState createState() => _LoadingScreenState();

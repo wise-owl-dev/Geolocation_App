@@ -7,10 +7,10 @@ class RouteCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const RouteCard({
-    Key? key,
+    super.key,
     required this.route,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

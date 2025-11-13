@@ -12,7 +12,7 @@ class BusStopStatus extends FormzInput<String, BusStopStatusError> {
   const BusStopStatus.pure() : super.pure('activo');
 
   // Constructor for modified value
-  const BusStopStatus.dirty(String value) : super.dirty(value);
+  const BusStopStatus.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

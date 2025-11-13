@@ -2,8 +2,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../shared/models/models.dart';
-import '../../../../shared/models/route_stop.dart';
-import '../../../../shared/models/bus_stop.dart';
 
 class RouteStopsState {
   final bool isLoading;

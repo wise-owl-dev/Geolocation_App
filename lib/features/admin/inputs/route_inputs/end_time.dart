@@ -16,7 +16,7 @@ class EndTime extends FormzInput<String, EndTimeError> {
   const EndTime.pure([this.startTime = '']) : super.pure('');
 
   // Constructor for modified value
-  const EndTime.dirty(String value, [this.startTime = '']) : super.dirty(value);
+  const EndTime.dirty(super.value, [this.startTime = '']) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

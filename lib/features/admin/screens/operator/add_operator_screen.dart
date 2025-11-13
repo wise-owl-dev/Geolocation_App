@@ -16,9 +16,9 @@ class AddOperatorScreen extends ConsumerStatefulWidget {
   final String? operatorId;
   
   const AddOperatorScreen({
-    Key? key, 
+    super.key, 
     this.operatorId,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<AddOperatorScreen> createState() => _AddOperatorScreenState();

@@ -7,7 +7,7 @@ import '../widgets/route_card.dart';
 import '../../../shared/widgets/loading_overlay.dart';
 
 class RoutesScreen extends ConsumerStatefulWidget {
-  const RoutesScreen({Key? key}) : super(key: key);
+  const RoutesScreen({super.key});
 
   @override
   ConsumerState<RoutesScreen> createState() => _RoutesScreenState();

@@ -12,12 +12,12 @@ class BusInfoPanel extends StatefulWidget {
   final VoidCallback onClose;
 
   const BusInfoPanel({
-    Key? key,
+    super.key,
     required this.bus,
     required this.assignment,
     this.lastLocation,
     required this.onClose,
-  }) : super(key: key);
+  });
 
   @override
   State<BusInfoPanel> createState() => _BusInfoPanelState();

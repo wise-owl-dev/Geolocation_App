@@ -61,7 +61,7 @@ class EditOperatorNotifier extends StateNotifier<EditOperatorState> {
       print('Datos del operador: $result');
       
       // Verificar si el resultado contiene datos de operador
-      if (result == null || result['operadores'] == null) {
+      if (result['operadores'] == null) {
         state = state.copyWith(
           isLoading: false,
           error: 'No se encontraron datos del operador',

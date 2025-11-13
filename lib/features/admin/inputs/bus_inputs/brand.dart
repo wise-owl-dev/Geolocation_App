@@ -9,7 +9,7 @@ class Brand extends FormzInput<String, BrandError> {
   const Brand.pure() : super.pure('');
 
   // Constructor for modified value
-  const Brand.dirty(String value) : super.dirty(value);
+  const Brand.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

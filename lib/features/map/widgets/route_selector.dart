@@ -9,12 +9,12 @@ class RouteSelector extends StatelessWidget {
   final VoidCallback onClearRoute;
 
   const RouteSelector({
-    Key? key,
+    super.key,
     required this.routes,
     this.selectedRouteId,
     required this.onRouteSelected,
     required this.onClearRoute,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

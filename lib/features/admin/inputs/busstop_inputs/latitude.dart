@@ -14,7 +14,7 @@ class Latitude extends FormzInput<String, LatitudeError> {
   const Latitude.pure() : super.pure('');
 
   // Constructor for modified value
-  const Latitude.dirty(String value) : super.dirty(value);
+  const Latitude.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

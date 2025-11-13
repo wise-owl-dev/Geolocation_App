@@ -5,7 +5,7 @@ import '../../providers/bus/buses_provider.dart';
 import '../../../../shared/widgets/custom_filled_button.dart';
 
 class BusesListScreen extends ConsumerStatefulWidget {
-  const BusesListScreen({Key? key}) : super(key: key);
+  const BusesListScreen({super.key});
 
   @override
   ConsumerState<BusesListScreen> createState() => _BusesListScreenState();

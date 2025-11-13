@@ -9,7 +9,7 @@ class RouteName extends FormzInput<String, RouteNameError> {
   const RouteName.pure() : super.pure('');
 
   // Constructor for modified value
-  const RouteName.dirty(String value) : super.dirty(value);
+  const RouteName.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

@@ -9,7 +9,7 @@ class Address extends FormzInput<String, AddressError> {
   const Address.pure() : super.pure('');
 
   // Constructor for modified value
-  const Address.dirty(String value) : super.dirty(value);
+  const Address.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

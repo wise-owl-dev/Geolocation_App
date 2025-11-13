@@ -12,7 +12,7 @@ class RouteStatus extends FormzInput<String, RouteStatusError> {
   const RouteStatus.pure() : super.pure('activo');
 
   // Constructor for modified value
-  const RouteStatus.dirty(String value) : super.dirty(value);
+  const RouteStatus.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

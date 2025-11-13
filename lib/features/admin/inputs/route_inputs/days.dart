@@ -14,7 +14,7 @@ class Days extends FormzInput<List<String>, DaysError> {
   const Days.pure() : super.pure(const []);
 
   // Constructor for modified value
-  const Days.dirty(List<String> value) : super.dirty(value);
+  const Days.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

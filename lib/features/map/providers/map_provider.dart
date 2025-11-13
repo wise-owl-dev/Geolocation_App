@@ -1,6 +1,5 @@
 // lib/features/map/providers/map_provider.dart
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:math';
 import 'package:flutter/material.dart';

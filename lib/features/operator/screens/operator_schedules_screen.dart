@@ -9,7 +9,7 @@ import '../../../shared/models/assignment.dart';
 import '../../../shared/widgets/widgets.dart';
 
 class OperatorSchedulesScreen extends ConsumerStatefulWidget {
-  const OperatorSchedulesScreen({Key? key}) : super(key: key);
+  const OperatorSchedulesScreen({super.key});
 
   @override
   ConsumerState<OperatorSchedulesScreen> createState() => _OperatorSchedulesScreenState();
@@ -184,7 +184,7 @@ class _OperatorSchedulesScreenState extends ConsumerState<OperatorSchedulesScree
             _buildDateHeader(DateTime.parse(dateStr)),
             
             // Asignaciones de ese día
-            ...dateAssignments.map((assignment) => _buildAssignmentCard(assignment)).toList(),
+            ...dateAssignments.map((assignment) => _buildAssignmentCard(assignment)),
             
             const SizedBox(height: 8),
           ],
@@ -232,7 +232,7 @@ class _OperatorSchedulesScreenState extends ConsumerState<OperatorSchedulesScree
   
   Widget _buildAssignmentCard(Assignment assignment) {
     // Formatear horas
-    final timeFormat = (time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    String timeFormat(time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     final timeRange = '${timeFormat(assignment.startTime)} - ${timeFormat(assignment.endTime)}';
     
     return Card(

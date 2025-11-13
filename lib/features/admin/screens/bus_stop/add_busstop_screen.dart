@@ -13,9 +13,9 @@ class AddBusStopScreen extends ConsumerStatefulWidget {
   final String? busStopId;
   
   const AddBusStopScreen({
-    Key? key, 
+    super.key, 
     this.busStopId,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<AddBusStopScreen> createState() => _AddBusStopScreenState();

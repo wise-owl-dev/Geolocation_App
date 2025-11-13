@@ -9,7 +9,7 @@ import '../../providers/route/routes_provider.dart';
 import '../../providers/route_stop/route_stops_provider.dart';
 
 class BusStopsListScreen extends ConsumerStatefulWidget {
-  const BusStopsListScreen({Key? key}) : super(key: key);
+  const BusStopsListScreen({super.key});
 
   @override
   ConsumerState<BusStopsListScreen> createState() => _BusStopsListScreenState();

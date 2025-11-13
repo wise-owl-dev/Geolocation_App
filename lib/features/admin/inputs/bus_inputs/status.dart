@@ -12,7 +12,7 @@ class Status extends FormzInput<String, StatusError> {
   const Status.pure() : super.pure('activo');
 
   // Constructor for modified value
-  const Status.dirty(String value) : super.dirty(value);
+  const Status.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

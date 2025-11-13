@@ -14,7 +14,7 @@ class LicenseNumber extends FormzInput<String, LicenseNumberError> {
   const LicenseNumber.pure() : super.pure('');
 
   // Constructor para valor modificado
-  const LicenseNumber.dirty(String value) : super.dirty(value);
+  const LicenseNumber.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

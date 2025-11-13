@@ -13,7 +13,7 @@ class Capacity extends FormzInput<String, CapacityError> {
   const Capacity.pure() : super.pure('');
 
   // Constructor for modified value
-  const Capacity.dirty(String value) : super.dirty(value);
+  const Capacity.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

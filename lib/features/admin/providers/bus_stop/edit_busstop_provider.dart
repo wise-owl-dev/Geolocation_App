@@ -58,14 +58,6 @@ class EditBusStopNotifier extends StateNotifier<EditBusStopState> {
       
       print('Bus stop data: $result');
       
-      if (result == null) {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'No se encontraron datos de la parada',
-        );
-        return;
-      }
-      
       // Create BusStop object
       final busStop = BusStop.fromJson(result);
       

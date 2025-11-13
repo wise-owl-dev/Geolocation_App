@@ -58,14 +58,6 @@ class EditBusNotifier extends StateNotifier<EditBusState> {
       
       print('Bus data: $result');
       
-      if (result == null) {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'No se encontraron datos del autobús',
-        );
-        return;
-      }
-      
       // Create Bus object
       final bus = Bus.fromJson(result);
       

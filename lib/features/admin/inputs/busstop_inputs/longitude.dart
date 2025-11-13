@@ -14,7 +14,7 @@ class Longitude extends FormzInput<String, LongitudeError> {
   const Longitude.pure() : super.pure('');
 
   // Constructor for modified value
-  const Longitude.dirty(String value) : super.dirty(value);
+  const Longitude.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

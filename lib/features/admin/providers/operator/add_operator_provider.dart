@@ -3,7 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/auth_service.dart' as CustomAuth;
 import '../../../../core/services/auth_service.dart' as CustomAuthService;
 import '../../../../core/services/auth_service.dart' as CustomAuthException show AuthException;
-import '../../../../shared/models/user.dart' as CustomUser;
 
 class AddOperatorState {
   final bool isLoading;

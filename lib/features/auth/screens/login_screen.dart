@@ -8,7 +8,7 @@ import '../../../shared/widgets/custom_text_form_field.dart';
 import '../../../shared/widgets/custom_filled_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();

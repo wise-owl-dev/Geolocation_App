@@ -15,7 +15,7 @@ import '../../../shared/models/bus.dart';
 import '../../../shared/models/location.dart' as custom_location;
 
 class BusMapScreen extends ConsumerStatefulWidget {
-  const BusMapScreen({Key? key}) : super(key: key);
+  const BusMapScreen({super.key});
 
   @override
   ConsumerState<BusMapScreen> createState() => _BusMapScreenState();
@@ -218,8 +218,8 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
         onPressed: () {
           _showLegendDialog(context);
         },
-        child: const Icon(Icons.info_outline),
         tooltip: 'Ver leyenda',
+        child: const Icon(Icons.info_outline),
       ),
     );
   }

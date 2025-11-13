@@ -16,9 +16,9 @@ class BusTrackingScreen extends ConsumerStatefulWidget {
   final String assignmentId;
 
   const BusTrackingScreen({
-    Key? key,
+    super.key,
     required this.assignmentId,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<BusTrackingScreen> createState() => _BusTrackingScreenState();
@@ -94,12 +94,10 @@ class _BusTrackingScreenState extends ConsumerState<BusTrackingScreen> {
     );
     
     // Update map view to follow bus
-    if (_mapController != null) {
-      _mapController.animateCamera(
-        CameraUpdate.newLatLng(position),
-      );
-    }
-    
+    _mapController.animateCamera(
+      CameraUpdate.newLatLng(position),
+    );
+      
     // Store the position for next update
     _lastPosition = position;
   }

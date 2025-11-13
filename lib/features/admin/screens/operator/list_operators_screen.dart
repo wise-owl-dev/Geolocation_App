@@ -6,7 +6,7 @@ import '../../providers/operator/operators_provider.dart';
 import '../../../../shared/widgets/custom_filled_button.dart';
 
 class OperatorsListScreen extends ConsumerStatefulWidget {
-  const OperatorsListScreen({Key? key}) : super(key: key);
+  const OperatorsListScreen({super.key});
 
   @override
   ConsumerState<OperatorsListScreen> createState() => _OperatorsListScreenState();

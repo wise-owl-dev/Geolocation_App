@@ -13,7 +13,7 @@ class CustomFilledButton extends StatelessWidget {
   final Widget? prefixIcon;
 
   const CustomFilledButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
@@ -24,7 +24,7 @@ class CustomFilledButton extends StatelessWidget {
     this.borderRadius = 8,
     this.padding,
     this.prefixIcon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

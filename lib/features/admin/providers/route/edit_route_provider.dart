@@ -58,14 +58,6 @@ class EditRouteNotifier extends StateNotifier<EditRouteState> {
       
       print('Route data: $result');
       
-      if (result == null) {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'No se encontraron datos del recorrido',
-        );
-        return;
-      }
-      
       // Create Route object
       final route = app_route.Route.fromJson(result);
       

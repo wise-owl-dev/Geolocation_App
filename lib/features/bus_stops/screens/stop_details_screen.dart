@@ -13,9 +13,9 @@ class StopDetailsScreen extends ConsumerStatefulWidget {
   final String stopId;
   
   const StopDetailsScreen({
-    Key? key,
+    super.key,
     required this.stopId,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<StopDetailsScreen> createState() => _StopDetailsScreenState();

@@ -37,7 +37,7 @@ class AddOperatorFormState {
     this.licenseType = const LicenseType.pure(),
     this.yearsExperience = const YearsExperience.pure(),
     DateTime? hireDate,
-  }) : this.hireDate = hireDate ?? DateTime.now();
+  }) : hireDate = hireDate ?? DateTime.now();
 
   AddOperatorFormState copyWith({
     bool? isPosting,

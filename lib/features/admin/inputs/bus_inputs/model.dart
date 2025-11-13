@@ -9,7 +9,7 @@ class Model extends FormzInput<String, ModelError> {
   const Model.pure() : super.pure('');
 
   // Constructor for modified value
-  const Model.dirty(String value) : super.dirty(value);
+  const Model.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;

@@ -9,7 +9,7 @@ import '../../map/providers/location_provider.dart';
 import '../../../shared/widgets/loading_overlay.dart';
 
 class NearbyStopsScreen extends ConsumerStatefulWidget {
-  const NearbyStopsScreen({Key? key}) : super(key: key);
+  const NearbyStopsScreen({super.key});
 
   @override
   ConsumerState<NearbyStopsScreen> createState() => _NearbyStopsScreenState();

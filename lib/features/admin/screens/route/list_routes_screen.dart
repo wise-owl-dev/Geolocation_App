@@ -7,7 +7,7 @@ import '../../providers/route/routes_provider.dart';
 
 
 class RoutesListScreen extends ConsumerStatefulWidget {
-  const RoutesListScreen({Key? key}) : super(key: key);
+  const RoutesListScreen({super.key});
 
   @override
   ConsumerState<RoutesListScreen> createState() => _RoutesListScreenState();

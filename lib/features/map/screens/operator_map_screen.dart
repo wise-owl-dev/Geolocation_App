@@ -15,9 +15,9 @@ class OperatorMapScreen extends ConsumerStatefulWidget {
   final String? assignmentId;
 
   const OperatorMapScreen({
-    Key? key,
+    super.key,
     this.assignmentId,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<OperatorMapScreen> createState() => _OperatorMapScreenState();
@@ -84,23 +84,21 @@ class _OperatorMapScreenState extends ConsumerState<OperatorMapScreen> {
           .single();
 
       // Process assignment data
-      if (result != null) {
-        final busData = result['autobuses'];
-        final routeData = result['recorridos'];
+      final busData = result['autobuses'];
+      final routeData = result['recorridos'];
 
-        // Create assignment object
-        _activeAssignment = Assignment.fromJson(
-          result,
-          busNumber: busData?['numero_unidad'],
-          routeName: routeData?['nombre'],
-        );
+      // Create assignment object
+      _activeAssignment = Assignment.fromJson(
+        result,
+        busNumber: busData?['numero_unidad'],
+        routeName: routeData?['nombre'],
+      );
 
-        // Load route stops on map
-        if (_activeAssignment?.routeId != null) {
-          await ref.read(mapProvider.notifier).selectRoute(_activeAssignment!.routeId);
-        }
+      // Load route stops on map
+      if (_activeAssignment?.routeId != null) {
+        await ref.read(mapProvider.notifier).selectRoute(_activeAssignment!.routeId);
       }
-    } catch (e) {
+        } catch (e) {
       throw Exception('Error al cargar la asignación: $e');
     }
   }
@@ -473,7 +471,7 @@ class _OperatorMapScreenState extends ConsumerState<OperatorMapScreen> {
     if (_activeAssignment == null) return const SizedBox.shrink();
 
     // Format time
-    final timeFormat = (TimeOfDay time) =>
+    String timeFormat(TimeOfDay time) =>
         '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     
     final startTime = timeFormat(_activeAssignment!.startTime);

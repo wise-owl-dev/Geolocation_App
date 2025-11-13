@@ -13,7 +13,7 @@ class YearsExperience extends FormzInput<String, YearsExperienceError> {
   const YearsExperience.pure() : super.pure('');
 
   // Constructor para valor modificado
-  const YearsExperience.dirty(String value) : super.dirty(value);
+  const YearsExperience.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
     if (isValid || isPure) return null;
