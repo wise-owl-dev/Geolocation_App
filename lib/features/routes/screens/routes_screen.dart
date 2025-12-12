@@ -93,19 +93,19 @@ class _RoutesScreenState extends ConsumerState<RoutesScreen> {
               // Encabezado de información
               Container(
                 padding: const EdgeInsets.all(16),
-                color: Colors.blue.shade50,
+                color: const Color(0xFF191970),
                 child: Row(
                   children: [
                     Icon(
                       Icons.info_outline,
-                      color: Colors.blue.shade700,
+                      color: const Color.fromARGB(255, 255, 255, 255),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Selecciona una ruta para ver su recorrido y paradas',
                         style: TextStyle(
-                          color: Colors.blue.shade700,
+                          color: const Color.fromARGB(255, 255, 255, 255),
                         ),
                       ),
                     ),
@@ -160,7 +160,7 @@ class _RoutesScreenState extends ConsumerState<RoutesScreen> {
           Icon(
             Icons.route_outlined,
             size: 80,
-            color: Colors.grey.shade400,
+            color: const Color.fromARGB(255, 255, 255, 255),
           ),
           const SizedBox(height: 16),
           Text(

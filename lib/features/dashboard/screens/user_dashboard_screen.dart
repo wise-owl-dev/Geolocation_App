@@ -65,12 +65,12 @@ class UserDashboardScreen extends ConsumerWidget {
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade100,
+                      color: const Color(0xFF191970),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: const Icon(
                       Icons.person,
-                      color: Colors.blue,
+                      color: Color.fromARGB(255, 255, 255, 255),
                       size: 30,
                     ),
                   ),
@@ -139,8 +139,8 @@ class UserDashboardScreen extends ConsumerWidget {
             _MenuOption(
               icon: Icons.logout,
               title: 'Cerrar sesión',
-              textColor: Colors.blue,
-              iconColor: Colors.blue,
+              textColor: const Color(0xFF191970),
+              iconColor: const Color.fromARGB(255, 255, 255, 255),
               onTap: () => _handleLogout(context, ref),
             ),
             const SizedBox(height: 16),
@@ -165,7 +165,7 @@ class _MenuOption extends StatelessWidget {
     required this.title,
     this.badge,
     this.textColor = const Color(0xFF1F2937),
-    this.iconColor = const Color(0xFF6B7280),
+    this.iconColor = const Color.fromARGB(255, 255, 255, 255),
     required this.onTap,
   });
 
@@ -176,7 +176,7 @@ class _MenuOption extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.blue.shade50,
+          color: const Color(0xFF191970),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
@@ -197,13 +197,13 @@ class _MenuOption extends StatelessWidget {
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.blue.shade100,
+                color: const Color(0xFF191970),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 badge!,
                 style: TextStyle(
-                  color: Colors.blue.shade700,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),

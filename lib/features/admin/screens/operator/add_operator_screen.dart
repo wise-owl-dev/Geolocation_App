@@ -550,7 +550,7 @@ Future<void> _loadOperatorData() async {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: Colors.blue,
+              primary: const Color(0xFF191970),
               onPrimary: Colors.white,
               onSurface: Colors.black,
             ),

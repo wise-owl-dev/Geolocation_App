@@ -99,7 +99,7 @@ class _BusSearchScreenState extends ConsumerState<BusSearchScreen> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.blue, width: 2),
+                            borderSide: BorderSide(color: const Color(0xFF191970), width: 2),
                           ),
                           contentPadding: const EdgeInsets.symmetric(vertical: 16),
                         ),
@@ -110,7 +110,7 @@ class _BusSearchScreenState extends ConsumerState<BusSearchScreen> {
                     Container(
                       height: 56,
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: const Color(0xFF191970),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: IconButton(
@@ -132,14 +132,14 @@ class _BusSearchScreenState extends ConsumerState<BusSearchScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.blue.shade300),
+                        side: BorderSide(color: const Color(0xFF191970)),
                       ),
                     ),
                     child: Text(
                       'Ver todos los autobuses',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.blue.shade700,
+                        color: const Color(0xFF191970),
                       ),
                     ),
                   ),
@@ -289,10 +289,10 @@ class _BusSearchScreenState extends ConsumerState<BusSearchScreen> {
             contentPadding: const EdgeInsets.all(16),
             leading: CircleAvatar(
               radius: 28,
-              backgroundColor: Colors.blue.shade100,
+              backgroundColor: const Color(0xFF191970),
               child: Icon(
                 Icons.directions_bus,
-                color: Colors.blue.shade800,
+                color: const Color.fromARGB(255, 255, 255, 255),
                 size: 28,
               ),
             ),

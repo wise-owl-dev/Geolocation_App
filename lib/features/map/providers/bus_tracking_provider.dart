@@ -1,6 +1,7 @@
 // lib/features/map/providers/bus_tracking_provider.dart
 // lib/features/map/providers/bus_tracking_provider.dart
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -401,7 +402,6 @@ class BusTrackingNotifier extends StateNotifier<BusTrackingState> {
     // Clear the polyline from the map
     _ref.read(mapProvider.notifier).removePolyline('bus_path');
   }
-
   @override
   void dispose() {
     _locationSubscription?.cancel();
@@ -415,6 +415,68 @@ class BusTrackingNotifier extends StateNotifier<BusTrackingState> {
     _individualTracking.clear();
     
     super.dispose();
+  }
+
+  // Calcular tiempo estimado de llegada a una parada
+  Future<Duration?> calculateEstimatedArrival(
+    String assignmentId,
+    String busStopId,
+  ) async {
+    try {
+      // Obtener la última ubicación del autobús
+      final lastLocation = state.lastLocations[assignmentId];
+      if (lastLocation == null || lastLocation.speed == null || lastLocation.speed == 0) {
+        return null; // No se puede calcular sin ubicación o velocidad
+      }
+
+      // Obtener las coordenadas de la parada
+      final stopResult = await _supabase
+          .from('paradas')
+          .select('latitud, longitud')
+          .eq('id', busStopId)
+          .single();
+
+      final stopLat = stopResult['latitud'] as double;
+      final stopLng = stopResult['longitud'] as double;
+
+      // Calcular distancia en kilómetros usando la fórmula de Haversine
+      final distance = _calculateDistance(
+        lastLocation.latitude,
+        lastLocation.longitude,
+        stopLat,
+        stopLng,
+      );
+
+      // Calcular tiempo en minutos (distancia / velocidad * 60)
+      // Añadir un factor de corrección para tráfico (1.3 = 30% más tiempo)
+      final speedKmh = lastLocation.speed!;
+      final timeInMinutes = (distance / speedKmh) * 60 * 1.3;
+
+      return Duration(minutes: timeInMinutes.round());
+    } catch (e) {
+      print('Error calculating estimated arrival: $e');
+      return null;
+    }
+  }
+
+  // Calcular distancia entre dos puntos usando la fórmula de Haversine
+  double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const double earthRadius = 6371; // Radio de la Tierra en kilómetros
+    
+    final dLat = _toRadians(lat2 - lat1);
+    final dLon = _toRadians(lon2 - lon1);
+    
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_toRadians(lat1)) * cos(_toRadians(lat2)) *
+        sin(dLon / 2) * sin(dLon / 2);
+    
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    
+    return earthRadius * c;
+  }
+
+  double _toRadians(double degrees) {
+    return degrees * pi / 180;
   }
 }
 

@@ -150,7 +150,7 @@ class _RouteDetailsScreenState extends ConsumerState<RouteDetailsScreen> {
       final polyline = Polyline(
         polylineId: polylineId,
         points: routePoints,
-        color: Colors.blue,
+        color: const Color(0xFF191970),
         width: 5,
       );
       
@@ -291,13 +291,13 @@ class _RouteDetailsScreenState extends ConsumerState<RouteDetailsScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
+                    color: const Color(0xFF191970),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     Icons.directions_bus,
                     size: 24,
-                    color: Colors.blue.shade800,
+                    color: const Color.fromARGB(255, 255, 255, 255),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -521,7 +521,7 @@ class _RouteDetailsScreenState extends ConsumerState<RouteDetailsScreen> {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: Colors.blue.shade700,
+            color: const Color(0xFF191970),
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -561,7 +561,7 @@ class _RouteDetailsScreenState extends ConsumerState<RouteDetailsScreen> {
         Container(
           width: 2,
           height: 30,
-          color: Colors.blue.shade300,
+          color: const Color(0xFF191970),
         ),
       ],
     );

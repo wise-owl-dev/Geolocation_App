@@ -58,7 +58,7 @@ class RouteSelector extends StatelessWidget {
     );
 
     return ListTile(
-      leading: Icon(Icons.route, color: Colors.blue.shade700),
+      leading: Icon(Icons.route, color: const Color(0xFF191970)),
       title: Text(
         selectedRoute.name,
         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -98,7 +98,7 @@ class RouteSelector extends StatelessWidget {
               value: route.id,
               child: Row(
                 children: [
-                  Icon(Icons.route, color: Colors.blue.shade700, size: 20),
+                  Icon(Icons.route, color: const Color(0xFF191970), size: 20),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

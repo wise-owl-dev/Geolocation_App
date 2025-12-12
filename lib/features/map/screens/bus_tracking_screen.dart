@@ -235,7 +235,7 @@ class _BusTrackingScreenState extends ConsumerState<BusTrackingScreen> {
               alignment: Alignment.topCenter,
               padding: const EdgeInsets.only(top: 16),
               child: Card(
-                color: Colors.blue.shade50,
+                color: const Color(0xFF191970),
                 child: const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text('Buscando tu ubicación...'),

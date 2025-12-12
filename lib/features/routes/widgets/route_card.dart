@@ -33,12 +33,12 @@ class RouteCard extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade100,
+                      color: const Color(0xFF191970),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       Icons.directions_bus,
-                      color: Colors.blue.shade700,
+                      color: const Color.fromARGB(255, 255, 255, 255),
                       size: 28,
                     ),
                   ),

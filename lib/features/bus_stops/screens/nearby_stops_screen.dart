@@ -112,7 +112,7 @@ class _NearbyStopsScreenState extends ConsumerState<NearbyStopsScreen> {
                       children: [
                         Icon(
                           Icons.adjust,
-                          color: Colors.blue.shade700,
+                          color: const Color(0xFF191970),
                           size: 20,
                         ),
                         const SizedBox(width: 8),
@@ -143,12 +143,12 @@ class _NearbyStopsScreenState extends ConsumerState<NearbyStopsScreen> {
                             ),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? Colors.blue.shade100
+                                  ? const Color(0xFF191970)
                                   : Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: isSelected
-                                    ? Colors.blue.shade700
+                                    ? const Color(0xFF191970)
                                     : Colors.transparent,
                               ),
                             ),
@@ -156,7 +156,7 @@ class _NearbyStopsScreenState extends ConsumerState<NearbyStopsScreen> {
                               '$radius km',
                               style: TextStyle(
                                 color: isSelected
-                                    ? Colors.blue.shade700
+                                    ? const Color.fromARGB(255, 255, 255, 255)
                                     : Colors.grey.shade700,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
@@ -242,8 +242,8 @@ class _NearbyStopsScreenState extends ConsumerState<NearbyStopsScreen> {
         circleId: const CircleId('search_radius'),
         center: locationState.currentLocation!,
         radius: _selectedRadius * 1000, // Convertir km a metros
-        fillColor: Colors.blue.withOpacity(0.1),
-        strokeColor: Colors.blue.withOpacity(0.5),
+        fillColor: const Color(0xFF191970).withOpacity(0.1),
+        strokeColor: const Color(0xFF191970).withOpacity(0.5),
         strokeWidth: 1,
       ),
     };

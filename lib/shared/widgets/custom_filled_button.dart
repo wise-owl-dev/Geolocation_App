@@ -34,7 +34,7 @@ class CustomFilledButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? Colors.blue,
+          backgroundColor: backgroundColor ?? const Color(0xFF191970), // Azul Marino Oscuro
           foregroundColor: textColor ?? Colors.white,
           padding: padding ?? const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(

@@ -893,7 +893,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
                     icon: Icon(_endDate == null ? Icons.add : Icons.remove),
                     label: Text(_endDate == null ? 'Agregar' : 'Quitar'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _endDate == null ? Colors.blue : Colors.red,
+                      backgroundColor: _endDate == null ? const Color(0xFF191970) : Colors.red,
                       foregroundColor: Colors.white,
                     ),
                   ),

@@ -158,11 +158,11 @@ class _RouteSelectionScreenState extends ConsumerState<RouteSelectionScreen> {
   Widget _buildRouteCard(app_route.Route route, bool isSelected) {
     return Card(
       elevation: isSelected ? 3 : 1,
-      color: isSelected ? Colors.blue.shade50 : null,
+      color: isSelected ? const Color(0xFF191970) : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: isSelected
-            ? BorderSide(color: Colors.blue.shade300, width: 2)
+            ? BorderSide(color: const Color(0xFF191970), width: 2)
             : BorderSide.none,
       ),
       child: InkWell(
@@ -176,12 +176,12 @@ class _RouteSelectionScreenState extends ConsumerState<RouteSelectionScreen> {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade100,
+                  color: const Color(0xFF191970),
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: Icon(
                   Icons.route,
-                  color: Colors.blue.shade700,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   size: 30,
                 ),
               ),
@@ -272,7 +272,7 @@ class _RouteSelectionScreenState extends ConsumerState<RouteSelectionScreen> {
         child: ElevatedButton(
           onPressed: _viewRouteOnMap,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
+            backgroundColor: const Color(0xFF191970),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(

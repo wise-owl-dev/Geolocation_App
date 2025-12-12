@@ -312,7 +312,7 @@ class _AssignmentsListScreenState extends ConsumerState<AssignmentsListScreen> {
                           // Información del operador
                           Row(
                             children: [
-                              const Icon(Icons.person, size: 16, color: Colors.blue),
+                              const Icon(Icons.person, size: 16, color: const Color(0xFF191970)),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
@@ -384,7 +384,7 @@ class _AssignmentsListScreenState extends ConsumerState<AssignmentsListScreen> {
                   children: [
                     // Botón para cambiar estado
                     IconButton(
-                      icon: const Icon(Icons.sync, color: Colors.blue),
+                      icon: const Icon(Icons.sync, color: const Color(0xFF191970)),
                       tooltip: 'Cambiar estado',
                       onPressed: () {
                         _showChangeStatusDialog(assignment);

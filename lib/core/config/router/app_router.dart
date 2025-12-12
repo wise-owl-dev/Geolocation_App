@@ -1,4 +1,3 @@
-
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../features/admin/screens/assignment/add_assignment_screen.dart';
@@ -22,6 +21,10 @@ import '../../../features/map/screens/bus_tracking_screen.dart';
 import '../../../features/map/screens/operator_map_screen.dart';
 import '../../../features/map/screens/route_selector_screen.dart';
 import '../../../features/operator/screens/operator_schedules_screen.dart';
+import '../../../features/reports/screens/bus_utilization_report.dart';
+import '../../../features/reports/screens/operator_performance_report.dart';
+import '../../../features/reports/screens/reports_screen.dart';
+import '../../../features/reports/screens/route_performance_report.dart';
 import '../../../features/routes/screens/route_details_screen.dart';
 import '../../../features/routes/screens/routes_screen.dart';
 import '../../../features/user/screens/search_bus_screen.dart';
@@ -30,6 +33,8 @@ import '../../../shared/screens/loading_screen.dart';
 import '../../../features/dashboard/screens/admin_dashboard_screen.dart';
 import '../../../features/dashboard/screens/operator_dashboard_screen.dart';
 import '../../../features/dashboard/screens/user_dashboard_screen.dart';
+
+
 // Provider para el router
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -38,10 +43,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/loading',
     routes: [
       // Rutas de autenticación
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/signup',
         builder: (context, state) => const SignUpScreen(),
@@ -70,7 +72,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/user-dashboard',
         builder: (context, state) => const UserDashboardScreen(),
       ),
-      
+
       // Rutas de administrador
       GoRoute(
         path: '/admin/operators',
@@ -88,7 +90,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-       // Rutas de administrador para autobuses
+      // Rutas de administrador para autobuses
       GoRoute(
         path: '/admin/buses',
         builder: (context, state) => const BusesListScreen(),
@@ -122,7 +124,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-       // Rutas de administrador para recorridos
+      // Rutas de administrador para recorridos
       GoRoute(
         path: '/admin/routes',
         builder: (context, state) => const RoutesListScreen(),
@@ -156,7 +158,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           final operatorId = state.uri.queryParameters['operatorId'];
           final busId = state.uri.queryParameters['busId'];
           final routeId = state.uri.queryParameters['routeId'];
-          
+
           return AddAssignmentScreen(
             preselectedOperatorId: operatorId,
             preselectedBusId: busId,
@@ -171,7 +173,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return AddAssignmentScreen(assignmentId: assignmentId);
         },
       ),
-      
+
       // Rutas de usuario
       GoRoute(
         path: '/user/bus-search',
@@ -188,7 +190,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return BusTrackingScreen(assignmentId: assignmentId);
         },
       ),
-        GoRoute(
+      GoRoute(
         path: '/user/routes',
         builder: (context, state) => const RoutesScreen(),
       ),
@@ -197,8 +199,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const NearbyStopsScreen(),
       ),
 
-      
-       // Rutas de detalles
+      // Rutas de detalles
       GoRoute(
         path: '/user/route-details/:id',
         builder: (context, state) {
@@ -213,7 +214,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           return StopDetailsScreen(stopId: stopId);
         },
       ),
-      
 
       // Rutas de operador
       GoRoute(
@@ -235,17 +235,39 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/operator/route-selector',
         builder: (context, state) => const RouteSelectionScreen(),
       ),
-    ],   
-    
+      GoRoute(
+        path: '/admin/reports',
+        name: 'admin-reports',
+        builder: (context, state) => const ReportsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/reports/routes',
+        name: 'route-performance',
+        builder: (context, state) => const RoutePerformanceReportScreen(),
+      ),
+      GoRoute(
+        path: '/admin/reports/operators',
+        name: 'operator-performance',
+        builder: (context, state) => const OperatorPerformanceReportScreen(),
+      ),
+      GoRoute(
+        path: '/admin/reports/buses',
+        name: 'bus-utilization',
+        builder: (context, state) => const BusUtilizationReportScreen(),
+      ),
+    ],
+
     // Lógica de redirección basada en el estado de autenticación
     redirect: (context, state) {
       // Verificar si hay error en el estado de autenticación
       final hasAuthError = authState.error != null;
-      
+
       // Si hay un error de autenticación y el usuario está en una ruta de autenticación,
       // no redirigir (mantener en la misma página)
       if (hasAuthError) {
-        final isAuthRoute = state.uri.toString() == '/login' || state.uri.toString() == '/signup';
+        final isAuthRoute =
+            state.uri.toString() == '/login' ||
+            state.uri.toString() == '/signup';
         if (isAuthRoute) {
           return null; // Mantener en la ruta actual
         }
@@ -254,16 +276,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       // Rutas accesibles sin autenticación
-      final isPublicRoute = state.uri.toString() == '/loading' || 
-                           state.uri.toString() == '/splash' || 
-                           state.uri.toString() == '/login' || 
-                           state.uri.toString() == '/signup';
+      final isPublicRoute =
+          state.uri.toString() == '/loading' ||
+          state.uri.toString() == '/splash' ||
+          state.uri.toString() == '/login' ||
+          state.uri.toString() == '/signup';
 
       // Si la app está cargando, permitir la ruta /loading
       if (state.uri.toString() == '/loading') {
         return null;
       }
-      
+
       // Durante la carga del estado de autenticación, mantener la ruta actual
       if (authState.isLoading) {
         return null;
@@ -275,7 +298,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       // Si el usuario está autenticado y está en una ruta pública, redirigir al dashboard según su rol
-      if (authState.isAuthenticated && isPublicRoute && state.uri.toString() != '/loading') {
+      if (authState.isAuthenticated &&
+          isPublicRoute &&
+          state.uri.toString() != '/loading') {
         final user = authState.user;
         if (user != null) {
           if (user.isAdmin) {
@@ -291,7 +316,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // En cualquier otro caso, permitir la navegación
       return null;
     },
-    
+
     // Configuración adicional para el router
     debugLogDiagnostics: true,
   );

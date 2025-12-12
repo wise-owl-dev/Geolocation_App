@@ -29,9 +29,9 @@ extension AssignmentStatusExtension on AssignmentStatus {
   
   Color get color {
     switch (this) {
-      case AssignmentStatus.programada: return Colors.blue;
+      case AssignmentStatus.programada: return const Color(0xFF191970);
       case AssignmentStatus.en_curso: return Colors.green;
-      case AssignmentStatus.completada: return Colors.purple;
+      case AssignmentStatus.completada: return Color(0xFFC71585);
       case AssignmentStatus.cancelada: return Colors.red;
     }
   }

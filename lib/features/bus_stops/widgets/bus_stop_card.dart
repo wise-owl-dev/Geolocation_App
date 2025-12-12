@@ -74,14 +74,14 @@ class BusStopCard extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade100,
+                      color: const Color(0xFF191970),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       _formatDistance(distance),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
+                        color: const Color(0xFF191970),
                         fontSize: 12,
                       ),
                     ),

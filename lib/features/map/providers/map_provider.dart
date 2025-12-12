@@ -246,7 +246,7 @@ class MapNotifier extends StateNotifier<MapState> {
         polylines['route_$routeId'] = Polyline(
           polylineId: PolylineId('route_$routeId'),
           points: routePoints,
-          color: Colors.blue,
+          color: const Color(0xFF191970),
           width: 5,
         );
       }

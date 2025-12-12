@@ -488,7 +488,7 @@ class _OperatorMapScreenState extends ConsumerState<OperatorMapScreen> {
               children: [
                 Icon(
                   Icons.directions_bus,
-                  color: Colors.blue.shade700,
+                  color: const Color(0xFF191970),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -594,7 +594,7 @@ class _OperatorMapScreenState extends ConsumerState<OperatorMapScreen> {
                   Expanded(
                     child: CustomFilledButton(
                       text: _isTrackingLocation ? 'Pausar Ubicación' : 'Reanudar Ubicación',
-                      backgroundColor: _isTrackingLocation ? Colors.orange : Colors.blue,
+                      backgroundColor: _isTrackingLocation ? Colors.orange : const Color(0xFF191970),
                       prefixIcon: Icon(
                         _isTrackingLocation ? Icons.pause : Icons.play_arrow,
                         color: Colors.white,

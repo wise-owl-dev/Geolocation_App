@@ -212,11 +212,11 @@ class _OperatorsListScreenState extends ConsumerState<OperatorsListScreen> {
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: CircleAvatar(
-                backgroundColor: Colors.blue.shade100,
+                backgroundColor: const Color(0xFF191970),
                 child: Text(
                   operator.name.isNotEmpty ? operator.name[0].toUpperCase() : '?',
                   style: TextStyle(
-                    color: Colors.blue.shade700,
+                    color: const Color.fromARGB(255, 255, 255, 255),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -252,7 +252,7 @@ class _OperatorsListScreenState extends ConsumerState<OperatorsListScreen> {
                   ),
                   // Botón de editar
                   IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    icon: const Icon(Icons.edit, color: const Color(0xFF191970)),
                     onPressed: () async {
                       // Navegar a la pantalla de edición del operador
                       final result = await context.push('/admin/edit-operator/${operator.id}');

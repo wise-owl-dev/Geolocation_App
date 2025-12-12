@@ -1,5 +1,6 @@
 // lib/features/map/providers/location_provider.dart
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:location/location.dart';
@@ -201,7 +202,7 @@ class LocationNotifier extends StateNotifier<LocationState> {
         'longitud': newLocation.longitude,
         'velocidad': locationData.speed,
         'timestamp': DateTime.now().toIso8601String(),
-        // No incluimos parada_actual_id y proxima_parada_id por ahora
+        'parada_actual_id': await _findNearestStop(newLocation),
       }).select();
 
       if (result.isNotEmpty) {
@@ -222,6 +223,65 @@ class LocationNotifier extends StateNotifier<LocationState> {
       );
     }
   }
+
+  // Encontrar la parada más cercana
+Future<String?> _findNearestStop(LatLng location) async {
+  try {
+    // Obtener todas las paradas de la ruta actual
+    // Esto requiere conocer el routeId de la asignación actual
+    // Por simplicidad, buscar la parada más cercana en un radio de 100m
+    
+    final result = await _supabase
+        .from('paradas')
+        .select()
+        .eq('estado', 'activo');
+    
+    double minDistance = double.infinity;
+    String? nearestStopId;
+    
+    for (var stop in result) {
+      final stopLat = stop['latitud'] as double;
+      final stopLng = stop['longitud'] as double;
+      
+      final distance = _calculateDistance(
+        location.latitude,
+        location.longitude,
+        stopLat,
+        stopLng,
+      );
+      
+      // Si está a menos de 100 metros (0.1 km)
+      if (distance < 0.1 && distance < minDistance) {
+        minDistance = distance;
+        nearestStopId = stop['id'] as String;
+      }
+    }
+    
+    return nearestStopId;
+  } catch (e) {
+    print('Error finding nearest stop: $e');
+    return null;
+  }
+}
+
+double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  const double earthRadius = 6371;
+  
+  final dLat = _toRadians(lat2 - lat1);
+  final dLon = _toRadians(lon2 - lon1);
+  
+  final a = sin(dLat / 2) * sin(dLat / 2) +
+      cos(_toRadians(lat1)) * cos(_toRadians(lat2)) *
+      sin(dLon / 2) * sin(dLon / 2);
+  
+  final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  
+  return earthRadius * c;
+}
+
+double _toRadians(double degrees) {
+  return degrees * pi / 180;
+}
 
   // Get location history for a specific assignment
   Future<void> fetchLocationHistory(String assignmentId) async {

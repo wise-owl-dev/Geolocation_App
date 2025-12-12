@@ -463,8 +463,8 @@ class _RouteStopsScreenState extends ConsumerState<RouteStopsScreen> {
           margin: const EdgeInsets.only(bottom: 8),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Colors.blue.shade100,
-              foregroundColor: Colors.blue.shade700,
+              backgroundColor: const Color(0xFF191970),
+              foregroundColor: const Color.fromARGB(255, 255, 255, 255),
               child: Text('${routeStop.order}'),
             ),
             title: Text(busStop?.name ?? 'Parada desconocida'),

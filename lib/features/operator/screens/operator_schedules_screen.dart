@@ -204,7 +204,7 @@ class _OperatorSchedulesScreenState extends ConsumerState<OperatorSchedulesScree
     
     if (dateOnly.isAtSameMomentAs(today)) {
       dateText = 'Hoy, ${DateFormat('d MMM').format(date)}';
-      backgroundColor = Colors.blue;
+      backgroundColor = const Color(0xFF191970);
     } else if (dateOnly.isAtSameMomentAs(tomorrow)) {
       dateText = 'Mañana, ${DateFormat('d MMM').format(date)}';
       backgroundColor = Colors.green;
@@ -412,14 +412,14 @@ class _FilterButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isActive ? Colors.blue : Colors.white,
-          foregroundColor: isActive ? Colors.white : Colors.blue,
+          backgroundColor: isActive ? const Color(0xFF191970) : Colors.white,
+          foregroundColor: isActive ? Colors.white : const Color(0xFF191970),
           elevation: isActive ? 2 : 0,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: BorderSide(
-              color: isActive ? Colors.blue : Colors.grey.shade300,
+              color: isActive ? const Color(0xFF191970) : Colors.grey.shade300,
             ),
           ),
         ),

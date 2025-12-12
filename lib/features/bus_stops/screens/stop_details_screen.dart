@@ -254,14 +254,14 @@ class _StopDetailsScreenState extends ConsumerState<StopDetailsScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade100,
+                      color: const Color(0xFF191970),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       _formatDistance(_distanceToUser!),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
+                        color: const Color(0xFF191970),
                         fontSize: 12,
                       ),
                     ),
@@ -405,12 +405,12 @@ class _StopDetailsScreenState extends ConsumerState<StopDetailsScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.blue.shade100,
+                color: const Color(0xFF191970),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 Icons.directions_bus,
-                color: Colors.blue.shade700,
+                color: const Color.fromARGB(255, 255, 255, 255),
                 size: 28,
               ),
             ),

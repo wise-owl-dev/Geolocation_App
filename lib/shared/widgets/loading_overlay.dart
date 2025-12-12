@@ -1,4 +1,3 @@
-// lib/shared/widgets/loading_overlay.dart
 import 'package:flutter/material.dart';
 
 class LoadingOverlay extends StatelessWidget {
@@ -9,7 +8,7 @@ class LoadingOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withOpacity(0.3),
+      color: const Color(0xFF2F4F4F).withOpacity(0.5), // Gris Oscuro con transparencia
       child: Center(
         child: Card(
           elevation: 4,
@@ -21,7 +20,9 @@ class LoadingOverlay extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const CircularProgressIndicator(),
+                const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF191970)), // Azul Marino
+                ),
                 if (message != null) ...[
                   const SizedBox(height: 16),
                   Text(
@@ -29,6 +30,7 @@ class LoadingOverlay extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Color(0xFF2F4F4F), // Gris Oscuro
                     ),
                   ),
                 ],

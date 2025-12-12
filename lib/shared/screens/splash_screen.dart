@@ -13,9 +13,8 @@ class SplashScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.fromARGB(255,33,150,243), // AZUL más oscuro
-               // AZUL más claro
-              Color.fromARGB(255, 195, 223, 245)
+              Color(0xFF191970), // Azul Marino Oscuro
+              Color(0xFFADD8E6), // Azul Cielo
             ],
           ),
         ),
@@ -28,7 +27,7 @@ class SplashScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(10.0),
                   child: Image.asset(
-                    'assets/images/splash_image.png', // Cambia a un asset local
+                    'assets/images/autobus.png',
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
@@ -60,7 +59,7 @@ class SplashScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1F2937),
+                        color: Color(0xFF2F4F4F), // Gris Oscuro
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -69,16 +68,16 @@ class SplashScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Color(0xFF6B7280),
+                        color: Color(0xFF2F4F4F), // Gris Oscuro
                       ),
                     ),
                     const SizedBox(height: 32),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: ()=> context.push('/login'),
+                        onPressed: () => context.push('/login'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255,33,150,243),
+                          backgroundColor: const Color(0xFF191970), // Azul Marino Oscuro
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(

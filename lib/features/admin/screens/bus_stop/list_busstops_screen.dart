@@ -227,10 +227,10 @@ class _BusStopsListScreenState extends ConsumerState<BusStopsListScreen> {
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           leading: CircleAvatar(
-            backgroundColor: Colors.blue.shade100,
+            backgroundColor: const Color(0xFF191970),
             child: const Icon(
               Icons.location_on,
-              color: Colors.blue,
+              color: Color.fromARGB(255, 255, 255, 255),
             ),
           ),
           title: Text(
@@ -296,7 +296,7 @@ class _BusStopsListScreenState extends ConsumerState<BusStopsListScreen> {
               ),
               // Edit button
               IconButton(
-                icon: const Icon(Icons.edit, color: Colors.blue),
+                icon: const Icon(Icons.edit, color: const Color(0xFF191970)),
                 onPressed: () async {
                   // Navigate to edit screen
                   final result = await context.push('/admin/edit-busstop/${busStop.id}');

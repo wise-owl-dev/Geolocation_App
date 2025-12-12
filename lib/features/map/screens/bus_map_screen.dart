@@ -244,12 +244,12 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: const Color(0xFF191970),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.info_outline,
-              color: Colors.blue.shade700,
+              color: const Color.fromARGB(255, 255, 255, 255),
               size: 24,
             ),
           ),
@@ -331,17 +331,17 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
+                    color: const Color(0xFF191970),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.directions_bus, color: Colors.blue.shade700, size: 16),
+                      Icon(Icons.directions_bus, color: const Color.fromARGB(255, 255, 255, 255), size: 16),
                       const SizedBox(width: 4),
                       Text(
                         'Autobuses activos: ${state.activeBuses.length}',
                         style: TextStyle(
-                          color: Colors.blue.shade700,
+                          color: const Color.fromARGB(255, 255, 255, 255),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -450,7 +450,7 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.blue.shade700,
+                color: const Color(0xFF191970),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
                   topRight: Radius.circular(8),
@@ -572,8 +572,8 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
               
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.blue.shade100,
-                  child: Icon(Icons.directions_bus, color: Colors.blue.shade700),
+                  backgroundColor: const Color(0xFF191970),
+                  child: Icon(Icons.directions_bus, color: const Color(0xFF191970)),
                 ),
                 title: Text('Unidad ${bus.busNumber}'),
                 subtitle: Text(
@@ -610,7 +610,7 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildLegendItem(
-              icon: Icon(Icons.directions_bus, color: Colors.blue.shade700),
+              icon: Icon(Icons.directions_bus, color: const Color(0xFF191970)),
               text: 'Autobús en ruta',
             ),
             const SizedBox(height: 12),
@@ -625,7 +625,7 @@ class _BusMapScreenState extends ConsumerState<BusMapScreen> {
             ),
             const SizedBox(height: 12),
             _buildLegendItem(
-              icon: Icon(Icons.linear_scale, color: Colors.blue.shade700),
+              icon: Icon(Icons.linear_scale, color: const Color(0xFF191970)),
               text: 'Recorrido de ruta',
             ),
             const SizedBox(height: 12),

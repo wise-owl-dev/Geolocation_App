@@ -1,9 +1,14 @@
 // lib/features/map/widgets/bus_info_panel.dart
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../shared/models/bus.dart';
 import '../../../shared/models/assignment.dart';
 import '../../../shared/models/location.dart' as custom_location;
+import '../../../shared/models/bus_stop.dart';
 
 class BusInfoPanel extends StatefulWidget {
   final Bus bus;
@@ -116,8 +121,11 @@ class _BusInfoPanelState extends State<BusInfoPanel> with SingleTickerProviderSt
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.blue.shade100,
-                  child: Icon(Icons.directions_bus, color: Colors.blue.shade700),
+                  backgroundColor: const Color(0xFF191970),
+                  child: Icon(
+                    Icons.directions_bus,
+                    color: const Color.fromARGB(255, 255, 255, 255),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -195,12 +203,12 @@ class _BusInfoPanelState extends State<BusInfoPanel> with SingleTickerProviderSt
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.blue.shade50,
+          color: const Color(0xFF191970),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: Colors.blue.shade700),
+            Icon(icon, size: 16, color: const Color.fromARGB(255, 255, 255, 255)),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
@@ -306,10 +314,65 @@ class _BusInfoPanelState extends State<BusInfoPanel> with SingleTickerProviderSt
                 ),
               ],
             ),
+
+          if (widget.assignment.routeId != null)
+            FutureBuilder<List<BusStop>>(
+              future: _loadRouteStops(widget.assignment.routeId!),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 12),
+                      ArrivalTimesPanel(
+                        assignmentId: widget.assignment.id,
+                        routeStops: snapshot.data!,
+                      ),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+  ),
         ],
       ),
     );
   }
+
+  Future<List<BusStop>> _loadRouteStops(String routeId) async {
+  try {
+    final supabase = Supabase.instance.client;
+    final result = await supabase
+        .from('recorrido_paradas')
+        .select('*, paradas(*)')
+        .eq('recorrido_id', routeId)
+        .order('orden');
+    
+    return result.map((item) => BusStop.fromJson(item['paradas'])).toList();
+  } catch (e) {
+    print('Error loading route stops: $e');
+    return [];
+  }
+}
+
+
+double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  const double earthRadius = 6371;
+  
+  final dLat = _toRadians(lat2 - lat1);
+  final dLon = _toRadians(lon2 - lon1);
+  
+  final a = sin(dLat / 2) * sin(dLat / 2) +
+      cos(_toRadians(lat1)) * cos(_toRadians(lat2)) *
+      sin(dLon / 2) * sin(dLon / 2);
+  
+  final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  
+  return earthRadius * c;
+}
+
+double _toRadians(double degrees) {
+  return degrees * pi / 180;
+}
 
   Widget _buildInfoSection({
     required String title,
@@ -439,5 +502,62 @@ class _BusInfoPanelState extends State<BusInfoPanel> with SingleTickerProviderSt
     } else {
       return DateFormat('dd/MM HH:mm').format(timestamp);
     }
+  }
+}
+
+class ArrivalTimesPanel extends StatelessWidget {
+  final String assignmentId;
+  final List<BusStop> routeStops;
+
+  const ArrivalTimesPanel({
+    Key? key,
+    required this.assignmentId,
+    required this.routeStops,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Minimal implementation: show header and a simple list of stops.
+    // Avoid accessing unknown BusStop fields to keep this file self-contained.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          'Llegadas (${routeStops.length})',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: List.generate(
+              routeStops.length,
+              (index) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: CircleAvatar(
+                  radius: 14,
+                  backgroundColor: const Color(0xFF191970),
+                  child: Text(
+                    '${index + 1}',
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+                title: Text('Parada ${index + 1}'),
+                subtitle: const Text('Tiempo estimado: --'), // Placeholder
+                dense: true,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

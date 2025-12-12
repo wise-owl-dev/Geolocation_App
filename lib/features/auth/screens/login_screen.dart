@@ -182,10 +182,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.blue.shade100,
+                color: const Color(0xFF191970),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.directions_bus, color: Colors.blue),
+              child: const Icon(Icons.directions_bus, color: Color.fromARGB(255, 255, 255, 255)),
             ),
             const SizedBox(width: 8),
             const Text(
@@ -229,7 +229,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: const Text(
           '¿Olvidaste tu contraseña?',
           style: TextStyle(
-            color: Colors.blue,
+            color: const Color(0xFF191970),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -252,7 +252,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             'Regístrate',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: const Color(0xFF191970),
             ),
           ),
         ),

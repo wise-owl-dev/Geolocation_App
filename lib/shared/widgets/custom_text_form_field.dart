@@ -1,5 +1,3 @@
-// lib/shared/widgets/custom_text_form_field.dart
-
 import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatelessWidget {
@@ -45,22 +43,31 @@ class CustomTextFormField extends StatelessWidget {
           decoration: InputDecoration(
             labelText: label,
             hintText: hint,
-            border: const OutlineInputBorder(),
-            // Personalización del estilo cuando hay error
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF191970)), // Azul Marino
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey.shade400),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF191970), width: 2), // Azul Marino
+            ),
             errorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red.shade700, width: 1.5),
+              borderSide: const BorderSide(color: Color(0xFFC71585), width: 1.5), // Rojo/Magenta
               borderRadius: BorderRadius.circular(8),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red.shade700, width: 2.0),
+              borderSide: const BorderSide(color: Color(0xFFC71585), width: 2.0), // Rojo/Magenta
               borderRadius: BorderRadius.circular(8),
             ),
             errorStyle: const TextStyle(
-              color: Colors.red,
+              color: Color(0xFFC71585), // Rojo/Magenta
               fontWeight: FontWeight.w500,
               fontSize: 12,
             ),
-            // Estilo cuando el campo está deshabilitado
             disabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
               borderRadius: BorderRadius.circular(8),
@@ -69,19 +76,18 @@ class CustomTextFormField extends StatelessWidget {
             filled: !enabled,
             suffixIcon: suffixIcon,
           ),
-          
         ),
         if (errorMessage != null)
           Padding(
             padding: const EdgeInsets.only(top: 4.0, left: 12.0),
             child: Row(
               children: [
-                Icon(Icons.error_outline, size: 14, color: Colors.red.shade700),
+                const Icon(Icons.error_outline, size: 14, color: Color(0xFFC71585)), // Rojo/Magenta
                 const SizedBox(width: 4),
                 Text(
                   errorMessage!,
-                  style: TextStyle(
-                    color: Colors.red.shade700,
+                  style: const TextStyle(
+                    color: Color(0xFFC71585), // Rojo/Magenta
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),

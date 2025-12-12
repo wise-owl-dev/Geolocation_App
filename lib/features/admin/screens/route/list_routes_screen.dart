@@ -214,10 +214,10 @@ class _RoutesListScreenState extends ConsumerState<RoutesListScreen> {
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: CircleAvatar(
-              backgroundColor: Colors.blue.shade100,
+              backgroundColor: const Color(0xFF191970),
               child: const Icon(
                 Icons.route,
-                color: Colors.blue,
+                color: Color.fromARGB(255, 255, 255, 255),
               ),
             ),
             title: Text(
@@ -294,7 +294,7 @@ class _RoutesListScreenState extends ConsumerState<RoutesListScreen> {
                 ),
                 // Botón de editar (existente)
                 IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
+                  icon: const Icon(Icons.edit, color: const Color(0xFF191970)),
                   onPressed: () async {
                     final result = await context.push('/admin/edit-route/${route.id}');
                     if (result == true && mounted) {

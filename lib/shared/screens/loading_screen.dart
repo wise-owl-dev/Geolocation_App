@@ -16,19 +16,15 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   void initState() {
     super.initState();
     
-    // Navegar a la pantalla de splash después de 2.5 segundos
-    // pero solo si no hay errores en el estado de autenticación
     Timer(
       const Duration(milliseconds: 2500),
       () {
         if (mounted) {
           final authState = ref.read(authProvider);
           
-          // Solo navegar si no hay errores
           if (authState.error == null) {
             context.go('/splash');
           } else {
-            // Si hay un error, ir directamente a login
             context.go('/login');
           }
         }
@@ -39,7 +35,7 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 33, 150, 243),
+      backgroundColor: const Color(0xFF191970), // Azul Marino Oscuro
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -62,7 +58,7 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
               child: const Icon(
                 Icons.directions_bus_rounded,
                 size: 80,
-                color: Color.fromARGB(255, 33, 150, 243),
+                color: Color(0xFF191970), // Azul Marino Oscuro
               ),
             ),
             const SizedBox(height: 30),
@@ -76,10 +72,20 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
                 letterSpacing: 1.2,
               ),
             ),
+            const SizedBox(height: 8),
+            const Text(
+              'Zaachila-Yoo',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFFADD8E6), // Azul Cielo
+                letterSpacing: 1.0,
+              ),
+            ),
             const SizedBox(height: 60),
             // Indicador de carga
             const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFADD8E6)), // Azul Cielo
               strokeWidth: 3,
             ),
           ],
