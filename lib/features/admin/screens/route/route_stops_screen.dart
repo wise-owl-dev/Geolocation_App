@@ -426,6 +426,15 @@ class _RouteStopsScreenState extends ConsumerState<RouteStopsScreen> {
         
         // Actualizar el orden en la base de datos
         try {
+          // Paso 1: Asignar valores temporales negativos para evitar conflictos
+          for (int i = 0; i < _routeStops.length; i++) {
+            await _supabase
+                .from('recorrido_paradas')
+                .update({'orden': -(i + 1)})
+                .eq('id', _routeStops[i].id);
+          }
+          
+          // Paso 2: Asignar los valores finales positivos
           for (int i = 0; i < _routeStops.length; i++) {
             await _supabase
                 .from('recorrido_paradas')
@@ -443,15 +452,30 @@ class _RouteStopsScreenState extends ConsumerState<RouteStopsScreen> {
           }
           
           // Forzar actualización de UI
-          if (mounted) setState(() {});
+          if (mounted) {
+            setState(() {});
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Orden actualizado correctamente'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
         } catch (e) {
           print('Error al actualizar orden: $e');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al actualizar orden: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          // Recargar datos para restaurar el estado correcto
+          await _loadData();
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error al actualizar orden: $e'),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
         }
       },
       itemBuilder: (context, index) {
