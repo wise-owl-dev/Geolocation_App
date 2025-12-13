@@ -16,7 +16,7 @@ class Phone extends FormzInput<String, PhoneError> {
   const Phone.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == PhoneError.empty) return 'El teléfono es requerido';
     if (displayError == PhoneError.format) return 'El teléfono solo debe contener números';

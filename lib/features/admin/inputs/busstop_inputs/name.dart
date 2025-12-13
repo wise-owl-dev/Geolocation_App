@@ -12,7 +12,7 @@ class BusStopName extends FormzInput<String, BusStopNameError> {
   const BusStopName.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == BusStopNameError.empty) return 'El nombre de la parada es requerido';
 

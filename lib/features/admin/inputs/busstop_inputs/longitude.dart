@@ -17,7 +17,7 @@ class Longitude extends FormzInput<String, LongitudeError> {
   const Longitude.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == LongitudeError.empty) return 'La longitud es requerida';
     if (displayError == LongitudeError.format) return 'Formato de longitud inválido (ej. -99.1332)';

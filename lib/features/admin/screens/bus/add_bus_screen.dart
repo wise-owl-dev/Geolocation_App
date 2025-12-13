@@ -238,77 +238,65 @@ class _AddBusScreenState extends ConsumerState<AddBusScreen> {
                   
                   // Bus Number field
                   CustomTextFormField(
-                    label: 'Número de Unidad',
+                    label: 'Número de Unidad ',
                     hint: 'Ej. BUS001',
                     controller: _busNumberController,
                     onChanged: ref.read(addBusFormProvider.notifier).onBusNumberChanged,
-                    errorMessage: busForm.isFormPosted ?
-                        busForm.busNumber.errorMessage 
-                        : null,
+                    errorMessage: busForm.busNumber.errorMessage,
                     enabled: !_isEditMode, // Don't allow editing in edit mode
                   ),
                   const SizedBox(height: 16),
                   
                   // License Plate field
                   CustomTextFormField(
-                    label: 'Placa',
+                    label: 'Placa ',
                     hint: 'Ej. ABC-123',
                     controller: _licensePlateController,
                     onChanged: ref.read(addBusFormProvider.notifier).onLicensePlateChanged,
-                    errorMessage: busForm.isFormPosted ?
-                        busForm.licensePlate.errorMessage 
-                        : null,
+                    errorMessage: busForm.licensePlate.errorMessage,
                     enabled: !_isEditMode, // Don't allow editing in edit mode
                   ),
                   const SizedBox(height: 16),
                   
                   // Capacity field
                   CustomTextFormField(
-                    label: 'Capacidad',
+                    label: 'Capacidad ',
                     hint: 'Ej. 40',
                     controller: _capacityController,
                     keyboardType: TextInputType.number,
                     onChanged: ref.read(addBusFormProvider.notifier).onCapacityChanged,
-                    errorMessage: busForm.isFormPosted ?
-                        busForm.capacity.errorMessage 
-                        : null,
+                    errorMessage: busForm.capacity.errorMessage ,
                   ),
                   const SizedBox(height: 16),
                   
                   // Model field
                   CustomTextFormField(
-                    label: 'Modelo',
+                    label: 'Modelo ',
                     hint: 'Ej. Sprinter',
                     controller: _modelController,
                     onChanged: ref.read(addBusFormProvider.notifier).onModelChanged,
-                    errorMessage: busForm.isFormPosted ?
-                        busForm.model.errorMessage 
-                        : null,
+                    errorMessage: busForm.model.errorMessage,
                   ),
                   const SizedBox(height: 16),
                   
                   // Brand field
                   CustomTextFormField(
-                    label: 'Marca',
+                    label: 'Marca ',
                     hint: 'Ej. Mercedes-Benz',
                     controller: _brandController,
                     onChanged: ref.read(addBusFormProvider.notifier).onBrandChanged,
-                    errorMessage: busForm.isFormPosted ?
-                        busForm.brand.errorMessage 
-                        : null,
+                    errorMessage: busForm.brand.errorMessage ,
                   ),
                   const SizedBox(height: 16),
                   
                   // Year field
                   CustomTextFormField(
-                    label: 'Año',
+                    label: 'Año ',
                     hint: 'Ej. 2022',
                     controller: _yearController,
                     keyboardType: TextInputType.number,
                     onChanged: ref.read(addBusFormProvider.notifier).onYearChanged,
-                    errorMessage: busForm.isFormPosted ?
-                        busForm.year.errorMessage 
-                        : null,
+                    errorMessage: busForm.year.errorMessage ,
                   ),
                   const SizedBox(height: 16),
                   
@@ -317,7 +305,7 @@ class _AddBusScreenState extends ConsumerState<AddBusScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Estado',
+                        'Estado del Autobús ',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,

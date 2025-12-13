@@ -12,7 +12,7 @@ class Brand extends FormzInput<String, BrandError> {
   const Brand.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid) return null;
 
     if (displayError == BrandError.empty) return 'La marca es requerida';
 

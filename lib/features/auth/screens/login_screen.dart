@@ -91,10 +91,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   hint: 'correo@ejemplo.com',
                   keyboardType: TextInputType.emailAddress,
                   onChanged: ref.read(loginFormProvider.notifier).onEmailChange,
-                  errorMessage:
-                      loginForm.isFormPosted
-                          ? loginForm.email.errorMessage
-                          : null,
+                  errorMessage: loginForm.email.errorMessage,
                 ),
                 const SizedBox(height: 16),
 
@@ -110,10 +107,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ref
                               .read(loginFormProvider.notifier)
                               .onPasswordChanged,
-                      errorMessage:
-                          loginForm.isFormPosted
-                              ? loginForm.password.errorMessage
-                              : null,
+                      errorMessage: loginForm.password.errorMessage,
                     ),
 
                     // Botón para mostrar/ocultar contraseña

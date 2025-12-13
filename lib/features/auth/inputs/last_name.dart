@@ -16,7 +16,7 @@ class LastName extends FormzInput<String, LastNameError> {
   const LastName.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == LastNameError.empty) return 'El apellido es requerido';
     if (displayError == LastNameError.format) return 'El apellido solo debe contener letras';

@@ -15,7 +15,7 @@ class BusStopStatus extends FormzInput<String, BusStopStatusError> {
   const BusStopStatus.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == BusStopStatusError.empty) return 'El estado es requerido';
     if (displayError == BusStopStatusError.invalid) return 'El estado debe ser activo o inactivo';

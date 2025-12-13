@@ -12,7 +12,7 @@ class Reference extends FormzInput<String, ReferenceError> {
   const Reference.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
     
     if (displayError == ReferenceError.tooLong) return 'La referencia es demasiado larga';
 

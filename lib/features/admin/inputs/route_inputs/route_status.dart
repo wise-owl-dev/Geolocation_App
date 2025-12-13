@@ -15,7 +15,7 @@ class RouteStatus extends FormzInput<String, RouteStatusError> {
   const RouteStatus.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == RouteStatusError.empty) return 'El estado es requerido';
     if (displayError == RouteStatusError.invalid) return 'El estado debe ser activo o inactivo';

@@ -320,9 +320,7 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
                     hint: 'Ej. Ruta Centro - Norte',
                     controller: _nameController,
                     onChanged: ref.read(addRouteFormProvider.notifier).onNameChanged,
-                    errorMessage: routeForm.isFormPosted ?
-                        routeForm.name.errorMessage 
-                        : null,
+                    errorMessage: routeForm.name.errorMessage ,
                   ),
                   const SizedBox(height: 16),
                   
@@ -359,9 +357,7 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
                         controller: _startTimeController,
                         keyboardType: TextInputType.datetime,
                         suffixIcon: const Icon(Icons.access_time),
-                        errorMessage: routeForm.isFormPosted ?
-                            routeForm.startTime.errorMessage 
-                            : null,
+                        errorMessage: routeForm.startTime.errorMessage ,
                       ),
                     ),
                   ),
@@ -377,9 +373,7 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
                         controller: _endTimeController,
                         keyboardType: TextInputType.datetime,
                         suffixIcon: const Icon(Icons.access_time),
-                        errorMessage: routeForm.isFormPosted ?
-                            routeForm.endTime.errorMessage 
-                            : null,
+                        errorMessage: routeForm.endTime.errorMessage,
                       ),
                     ),
                   ),
@@ -413,7 +407,7 @@ class _AddRouteScreenState extends ConsumerState<AddRouteScreen> {
                   }),
                   
                   // Show error message if no day is selected
-                  if (routeForm.isFormPosted && routeForm.days.errorMessage != null)
+                  if (routeForm.days.errorMessage != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0, left: 12.0),
                       child: Row(

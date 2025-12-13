@@ -12,7 +12,7 @@ class Address extends FormzInput<String, AddressError> {
   const Address.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
     
     if (displayError == AddressError.tooLong) return 'La dirección es demasiado larga';
 

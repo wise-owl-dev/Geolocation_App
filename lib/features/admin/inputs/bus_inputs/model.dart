@@ -12,7 +12,7 @@ class Model extends FormzInput<String, ModelError> {
   const Model.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == ModelError.empty) return 'El modelo es requerido';
 

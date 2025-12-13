@@ -17,7 +17,7 @@ class LicensePlate extends FormzInput<String, LicensePlateError> {
   const LicensePlate.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == LicensePlateError.empty) return 'La placa es requerida';
     if (displayError == LicensePlateError.format) return 'Formato de placa no válido';

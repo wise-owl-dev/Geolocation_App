@@ -16,7 +16,7 @@ class Capacity extends FormzInput<String, CapacityError> {
   const Capacity.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == CapacityError.empty) return 'La capacidad es requerida';
     if (displayError == CapacityError.format) return 'Ingrese solo números';

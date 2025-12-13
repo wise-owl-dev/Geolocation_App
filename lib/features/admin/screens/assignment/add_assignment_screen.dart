@@ -32,6 +32,9 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
   bool _isEditMode = false;
   String? _error;
   
+  // NUEVO: Variable para controlar si se deben mostrar los errores
+  bool _showValidationErrors = true; // Cambiado a true para mostrar desde el inicio
+  
   // Listas de datos precargados
   List<dynamic> _operators = [];
   List<dynamic> _buses = [];
@@ -58,6 +61,11 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
     _selectedOperatorId = widget.preselectedOperatorId;
     _selectedBusId = widget.preselectedBusId;
     _selectedRouteId = widget.preselectedRouteId;
+    
+    // Si hay valores preseleccionados, no mostrar errores inicialmente
+    if (_selectedOperatorId != null || _selectedBusId != null || _selectedRouteId != null) {
+      _showValidationErrors = false;
+    }
     
     // Ajustar hora de inicio a la actual si es hoy
     _adjustStartTimeToNow();
@@ -136,6 +144,8 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
       // 3. En modo edición, cargar datos de la asignación
       if (_isEditMode) {
         await _loadAssignmentData();
+        // En modo edición, no mostrar errores hasta que se intente guardar
+        _showValidationErrors = false;
       }
       
       setState(() {
@@ -610,6 +620,11 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
   
   // Método para guardar la asignación con validaciones
   Future<void> _saveAssignment() async {
+    // CAMBIO: Activar la visualización de errores al intentar guardar
+    setState(() {
+      _showValidationErrors = true;
+    });
+    
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -734,6 +749,10 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
   Widget _buildForm() {
     return Form(
       key: _formKey,
+      // CAMBIO: Activar la validación automática para mostrar errores desde el inicio
+      autovalidateMode: _showValidationErrors 
+          ? AutovalidateMode.always 
+          : AutovalidateMode.disabled,
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -749,14 +768,14 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
             ),
             const SizedBox(height: 16),
             
-            // Operador
+            // Operador - ASTERISCO AGREGADO
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(
-                labelText: 'Operador',
+                labelText: 'Operador *',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.person),
               ),
-              initialValue: _selectedOperatorId,
+              value: _selectedOperatorId,
               items: _operators.map((op) {
                 final fullName = '${op['nombre']} ${op['apellido_paterno'] ?? ''} ${op['apellido_materno'] ?? ''}'.trim();
                 return DropdownMenuItem<String>(
@@ -778,14 +797,14 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
             ),
             const SizedBox(height: 16),
             
-            // Autobús
+            // Autobús - ASTERISCO AGREGADO
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(
-                labelText: 'Autobús',
+                labelText: 'Autobús *',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.directions_bus),
               ),
-              initialValue: _selectedBusId,
+              value: _selectedBusId,
               items: _buses.map((bus) {
                 return DropdownMenuItem<String>(
                   value: bus['id'],
@@ -806,14 +825,14 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
             ),
             const SizedBox(height: 16),
             
-            // Recorrido
+            // Recorrido - ASTERISCO AGREGADO
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(
-                labelText: 'Recorrido',
+                labelText: 'Recorrido *',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.route),
               ),
-              initialValue: _selectedRouteId,
+              value: _selectedRouteId,
               items: _routes.map((route) {
                 return DropdownMenuItem<String>(
                   value: route['id'],
@@ -844,12 +863,12 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
             ),
             const SizedBox(height: 16),
             
-            // Fecha de inicio
+            // Fecha de inicio - ASTERISCO AGREGADO
             InkWell(
               onTap: () => _selectDate(context, true),
               child: InputDecorator(
                 decoration: const InputDecoration(
-                  labelText: 'Fecha de inicio',
+                  labelText: 'Fecha de inicio *',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.calendar_today),
                 ),
@@ -902,7 +921,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
             ),
             const SizedBox(height: 16),
             
-            // Hora de inicio y fin
+            // Hora de inicio y fin - ASTERISCOS AGREGADOS
             Row(
               children: [
                 // Hora de inicio
@@ -911,7 +930,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
                     onTap: () => _selectTime(context, true),
                     child: InputDecorator(
                       decoration: const InputDecoration(
-                        labelText: 'Hora de inicio',
+                        labelText: 'Hora de inicio *',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.access_time),
                       ),
@@ -929,7 +948,7 @@ class _AddAssignmentScreenState extends ConsumerState<AddAssignmentScreen> {
                     onTap: () => _selectTime(context, false),
                     child: InputDecorator(
                       decoration: const InputDecoration(
-                        labelText: 'Hora de fin',
+                        labelText: 'Hora de fin *',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.access_time),
                       ),

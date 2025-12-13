@@ -239,9 +239,7 @@ class _AddBusStopScreenState extends ConsumerState<AddBusStopScreen> {
                     hint: 'Ej. Estación Central',
                     controller: _nameController,
                     onChanged: ref.read(addBusStopFormProvider.notifier).onNameChanged,
-                    errorMessage: busStopForm.isFormPosted ?
-                        busStopForm.name.errorMessage 
-                        : null,
+                    errorMessage: busStopForm.name.errorMessage,
                   ),
                   const SizedBox(height: 16),
                   
@@ -262,9 +260,7 @@ class _AddBusStopScreenState extends ConsumerState<AddBusStopScreen> {
                     controller: _latitudeController,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     onChanged: ref.read(addBusStopFormProvider.notifier).onLatitudeChanged,
-                    errorMessage: busStopForm.isFormPosted ?
-                        busStopForm.latitude.errorMessage 
-                        : null,
+                    errorMessage: busStopForm.latitude.errorMessage ,
                   ),
                   const SizedBox(height: 16),
                   
@@ -275,9 +271,7 @@ class _AddBusStopScreenState extends ConsumerState<AddBusStopScreen> {
                     controller: _longitudeController,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
                     onChanged: ref.read(addBusStopFormProvider.notifier).onLongitudeChanged,
-                    errorMessage: busStopForm.isFormPosted ?
-                        busStopForm.longitude.errorMessage 
-                        : null,
+                    errorMessage: busStopForm.longitude.errorMessage ,
                   ),
                   const SizedBox(height: 16),
                   

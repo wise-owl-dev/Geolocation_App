@@ -12,7 +12,7 @@ class BusNumber extends FormzInput<String, BusNumberError> {
   const BusNumber.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == BusNumberError.empty) return 'El número de unidad es requerido';
     if (displayError == BusNumberError.format) return 'El número de unidad no es válido';

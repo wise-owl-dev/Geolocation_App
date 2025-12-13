@@ -15,7 +15,7 @@ class Status extends FormzInput<String, StatusError> {
   const Status.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == StatusError.empty) return 'El estado es requerido';
     if (displayError == StatusError.invalid) return 'El estado debe ser activo, inactivo o mantenimiento';

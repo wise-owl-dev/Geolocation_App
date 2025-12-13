@@ -17,7 +17,7 @@ class LicenseNumber extends FormzInput<String, LicenseNumberError> {
   const LicenseNumber.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == LicenseNumberError.empty) return 'El número de licencia es requerido';
     // Actualizamos el mensaje de error para reflejar que solo se permiten números

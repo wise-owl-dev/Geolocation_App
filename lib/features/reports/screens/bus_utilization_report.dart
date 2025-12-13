@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/reports_provider.dart';
+import '../services/report_export_service.dart';
 import '../../../shared/widgets/custom_filled_button.dart';
 
 class BusUtilizationReportScreen extends ConsumerStatefulWidget {
@@ -15,6 +16,9 @@ class BusUtilizationReportScreen extends ConsumerStatefulWidget {
 
 class _BusUtilizationReportScreenState
     extends ConsumerState<BusUtilizationReportScreen> {
+  final _exportService = ReportExportService();
+  bool _isExporting = false;
+
   @override
   void initState() {
     super.initState();
@@ -42,13 +46,23 @@ class _BusUtilizationReportScreenState
               ref.read(reportsProvider.notifier).generateBusUtilizationReport();
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.download),
-            tooltip: 'Exportar',
-            onPressed: () {
-              _showExportDialog(context);
-            },
-          ),
+          if (reportsState.busUtilization != null && !_isExporting)
+            IconButton(
+              icon: const Icon(Icons.download),
+              tooltip: 'Exportar',
+              onPressed: () {
+                _showExportDialog(context);
+              },
+            ),
+          if (_isExporting)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
         ],
       ),
       body: reportsState.isLoading
@@ -645,25 +659,40 @@ class _BusUtilizationReportScreenState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Exportar Reporte'),
-        content: const Text(
-          '¿En qué formato desea exportar el reporte?',
+        title: Row(
+          children: [
+            Icon(Icons.download, color: Colors.orange.shade700),
+            const SizedBox(width: 8),
+            const Text('Exportar Reporte'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Seleccione el formato de exportación:'),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
+              title: const Text('Documento PDF'),
+              subtitle: const Text('Formato profesional para imprimir'),
+              onTap: () {
+                Navigator.pop(context);
+                _exportReport('PDF');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.table_chart, color: Colors.green),
+              title: const Text('Hoja de Cálculo CSV'),
+              subtitle: const Text('Para análisis en Excel o Google Sheets'),
+              onTap: () {
+                Navigator.pop(context);
+                _exportReport('CSV');
+              },
+            ),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _exportReport('PDF');
-            },
-            child: const Text('PDF'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _exportReport('CSV');
-            },
-            child: const Text('CSV'),
-          ),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancelar'),
@@ -673,14 +702,104 @@ class _BusUtilizationReportScreenState
     );
   }
 
-  void _exportReport(String format) {
+  Future<void> _exportReport(String format) async {
+    final reportsState = ref.read(reportsProvider);
+    
+    if (reportsState.selectedStartDate == null || 
+        reportsState.selectedEndDate == null) {
+      _showErrorSnackBar('Error: No hay fechas seleccionadas');
+      return;
+    }
+
+    if (reportsState.busUtilization == null) {
+      _showErrorSnackBar('Error: No hay datos para exportar');
+      return;
+    }
+
+    setState(() => _isExporting = true);
+
+    try {
+      String filePath;
+      
+      if (format == 'PDF') {
+        filePath = await _exportService.exportBusUtilizationToPDF(
+          data: reportsState.busUtilization!,
+          startDate: reportsState.selectedStartDate!,
+          endDate: reportsState.selectedEndDate!,
+        );
+      } else {
+        filePath = await _exportService.exportBusUtilizationToCSV(
+          data: reportsState.busUtilization!,
+          startDate: reportsState.selectedStartDate!,
+          endDate: reportsState.selectedEndDate!,
+        );
+      }
+
+      setState(() => _isExporting = false);
+
+      if (mounted) {
+        _showSuccessDialog(filePath, format);
+      }
+    } catch (e) {
+      setState(() => _isExporting = false);
+      _showErrorSnackBar('Error al exportar: $e');
+    }
+  }
+
+  void _showSuccessDialog(String filePath, String format) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: Icon(Icons.check_circle, color: Colors.green.shade600, size: 48),
+        title: const Text('Exportación Exitosa'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('El reporte se ha exportado correctamente en formato $format.'),
+            const SizedBox(height: 8),
+            Text(
+              'Archivo guardado',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+          FilledButton.icon(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await _exportService.shareFile(filePath);
+              } catch (e) {
+                _showErrorSnackBar('Error al compartir: $e');
+              }
+            },
+            icon: const Icon(Icons.share),
+            label: const Text('Compartir'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Exportando reporte en formato $format...'),
-        action: SnackBarAction(
-          label: 'Ver',
-          onPressed: () {},
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
         ),
+        backgroundColor: Colors.red.shade700,
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }

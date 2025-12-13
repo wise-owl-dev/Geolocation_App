@@ -17,7 +17,7 @@ class LicenseType extends FormzInput<String, LicenseTypeError> {
   const LicenseType.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == LicenseTypeError.empty) return 'El tipo de licencia es requerido';
     // Agregamos mensaje de error para formato inválido

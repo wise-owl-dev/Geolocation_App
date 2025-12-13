@@ -16,7 +16,7 @@ class YearsExperience extends FormzInput<String, YearsExperienceError> {
   const YearsExperience.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == YearsExperienceError.empty) return 'Los años de experiencia son requeridos';
     if (displayError == YearsExperienceError.format) return 'Ingrese solo números';

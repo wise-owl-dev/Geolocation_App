@@ -263,57 +263,49 @@ Future<void> _loadOperatorData() async {
                     ),
                     const SizedBox(height: 16),
                     
-                    // Campo de nombre
+                    // Campo de nombre - ASTERISCO SIEMPRE VISIBLE
                     CustomTextFormField(
                       label: 'Nombre',
                       hint: 'Ingrese el nombre',
                       controller: _nameController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onNameChanged,
-                      errorMessage: operatorForm.isFormPosted ?
-                          operatorForm.name.errorMessage 
-                          : null,
+                      errorMessage: operatorForm.name.errorMessage,
                     ),
                     const SizedBox(height: 16),
                     
-                    // Campo de apellido paterno
+                    // Campo de apellido paterno - ASTERISCO SIEMPRE VISIBLE
                     CustomTextFormField(
-                      label: 'Apellido Paterno',
-                      hint: 'Ingrese el apellido paterno',
+                      label: 'Primer Apellido',
+                      hint: 'Ingrese su primer apellido',
                       controller: _lastNameController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onLastNameChanged,
-                      errorMessage: operatorForm.isFormPosted ?
-                          operatorForm.lastName.errorMessage 
-                          : null,
+                      errorMessage: operatorForm.lastName.errorMessage,
                     ),
                     const SizedBox(height: 16),
                     
-                    // Campo de apellido materno
+                    // Campo de apellido materno (opcional - sin asterisco)
                     CustomTextFormField(
-                      label: 'Apellido Materno (opcional)',
-                      hint: 'Ingrese el apellido materno',
+                      label: 'Segundo Apellido (opcional)',
+                      hint: 'Ingrese su segundo apellido',
                       controller: _maternalLastNameController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onMaternalLastNameChanged,
-                      errorMessage: operatorForm.isFormPosted ?
-                          operatorForm.maternalLastName.errorMessage 
-                          : null,
+                      errorMessage: null, // Campo opcional, no mostrar error
                     ),
                     const SizedBox(height: 16),
                     
-                    // Campo de email
+                    // Campo de email - ASTERISCO SIEMPRE VISIBLE
                     CustomTextFormField(
                       label: 'Email',
                       hint: 'correo@ejemplo.com',
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onEmailChange,
-                      errorMessage: operatorForm.isFormPosted ?
-                          operatorForm.email.errorMessage 
-                          : null,
+                      errorMessage: operatorForm.email.errorMessage,
                       enabled: !_isEditMode, // No permitir editar email en modo edición
                     ),
                     const SizedBox(height: 16),
                     
-                    // Campo de contraseña (solo visible en modo creación)
+                    // Campo de contraseña (solo visible en modo creación) - ASTERISCO SIEMPRE VISIBLE
                     if (!_isEditMode) ...[
                       Stack(
                         alignment: Alignment.centerRight,
@@ -323,9 +315,7 @@ Future<void> _loadOperatorData() async {
                             hint: '********',
                             obscureText: _obscurePassword,
                             onChanged: ref.read(addOperatorFormProvider.notifier).onPasswordChanged,
-                            errorMessage: operatorForm.isFormPosted ?
-                                operatorForm.password.errorMessage 
-                                : null,
+                            errorMessage: operatorForm.password.errorMessage,
                           ),
                           
                           // Botón para mostrar/ocultar contraseña
@@ -345,7 +335,7 @@ Future<void> _loadOperatorData() async {
                           ),
                         ],
                       ),
-                      if (operatorForm.isFormPosted && operatorForm.password.errorMessage == null)
+                      if (operatorForm.password.errorMessage == null && operatorForm.password.value.isEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0, left: 12.0),
                           child: Text(
@@ -359,16 +349,14 @@ Future<void> _loadOperatorData() async {
                       const SizedBox(height: 16),
                     ],
                     
-                    // Campo de teléfono
+                    // Campo de teléfono - ASTERISCO SIEMPRE VISIBLE
                     CustomTextFormField(
                       label: 'Teléfono',
                       hint: 'Ingrese el número de teléfono',
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onPhoneChanged,
-                      errorMessage: operatorForm.isFormPosted ?
-                          operatorForm.phone.errorMessage 
-                          : null,
+                      errorMessage: operatorForm.phone.errorMessage,
                     ),
                     const SizedBox(height: 32),
                     
@@ -382,45 +370,39 @@ Future<void> _loadOperatorData() async {
                     ),
                     const SizedBox(height: 16),
                     
-                    // Campo de número de licencia
+                    // Campo de número de licencia - ASTERISCO SIEMPRE VISIBLE
                     CustomTextFormField(
                       label: 'Número de Licencia',
                       hint: 'Ej. 12345678',
                       controller: _licenseNumberController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onLicenseNumberChanged,
-                      errorMessage: operatorForm.isFormPosted ?
-                          operatorForm.licenseNumber.errorMessage 
-                          : null,
+                      errorMessage: operatorForm.licenseNumber.errorMessage,
                       enabled: !_isEditMode, // No permitir editar licencia en modo edición
                     ),
                     const SizedBox(height: 16),
                     
-                    // Campo de tipo de licencia
+                    // Campo de tipo de licencia - ASTERISCO SIEMPRE VISIBLE
                     CustomTextFormField(
                       label: 'Tipo de Licencia',
                       hint: 'Ej. C',
                       controller: _licenseTypeController,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onLicenseTypeChanged,
-                      errorMessage: operatorForm.isFormPosted ?
-                          operatorForm.licenseType.errorMessage 
-                          : null,
+                      errorMessage: operatorForm.licenseType.errorMessage,
                     ),
                     const SizedBox(height: 16),
                     
-                    // Campo de años de experiencia
+                    // Campo de años de experiencia - ASTERISCO SIEMPRE VISIBLE
                     CustomTextFormField(
                       label: 'Años de Experiencia',
                       hint: 'Ej. 5',
                       controller: _yearsExperienceController,
                       keyboardType: TextInputType.number,
                       onChanged: ref.read(addOperatorFormProvider.notifier).onYearsExperienceChanged,
-                      errorMessage: operatorForm.isFormPosted ?
-                          operatorForm.yearsExperience.errorMessage 
-                          : null,
+                      errorMessage: operatorForm.yearsExperience.errorMessage,
                     ),
                     const SizedBox(height: 16),
                     
-                    // Campo de fecha de contratación
+                    // Campo de fecha de contratación - ASTERISCO SIEMPRE VISIBLE
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

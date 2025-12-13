@@ -16,7 +16,7 @@ class Name extends FormzInput<String, NameError> {
   const Name.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid) return null;
 
     if (displayError == NameError.empty) return 'El nombre es requerido';
     if (displayError == NameError.format) return 'El nombre solo debe contener letras';

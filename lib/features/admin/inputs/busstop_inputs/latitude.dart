@@ -17,7 +17,7 @@ class Latitude extends FormzInput<String, LatitudeError> {
   const Latitude.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
 
     if (displayError == LatitudeError.empty) return 'La latitud es requerida';
     if (displayError == LatitudeError.format) return 'Formato de latitud inválido (ej. 19.4326)';

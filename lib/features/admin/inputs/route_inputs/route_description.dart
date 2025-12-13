@@ -12,7 +12,7 @@ class RouteDescription extends FormzInput<String, RouteDescriptionError> {
   const RouteDescription.dirty(super.value) : super.dirty();
 
   String? get errorMessage {
-    if (isValid || isPure) return null;
+    if (isValid ) return null;
     
     if (displayError == RouteDescriptionError.tooLong) return 'La descripción es demasiado larga';
 

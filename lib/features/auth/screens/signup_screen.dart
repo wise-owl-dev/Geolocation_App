@@ -107,27 +107,23 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 label: 'Nombre',
                 hint: 'Ingrese su nombre',
                 onChanged: ref.read(signUpFormProvider.notifier).onNameChanged,
-                errorMessage: signUpForm.isFormPosted ?
-                    signUpForm.name.errorMessage 
-                    : null,
+                errorMessage: signUpForm.name.errorMessage,
               ),
               const SizedBox(height: 16),
               
               // Campo de apellido paterno
               CustomTextFormField(
-                label: 'Apellido Paterno',
-                hint: 'Ingrese su apellido paterno',
+                label: 'Primer Apellido',
+                hint: 'Ingrese su primer apellido',
                 onChanged: ref.read(signUpFormProvider.notifier).onLastNameChanged,
-                errorMessage: signUpForm.isFormPosted ?
-                    signUpForm.lastName.errorMessage 
-                    : null,
+                errorMessage: signUpForm.lastName.errorMessage ,
               ),
               const SizedBox(height: 16),
               
               // Campo de apellido materno
               CustomTextFormField(
-                label: 'Apellido Materno (opcional)',
-                hint: 'Ingrese su apellido materno',
+                label: 'Segundo Apellido (opcional)',
+                hint: 'Ingrese su segundo apellido',
                 onChanged: ref.read(signUpFormProvider.notifier).onMaternalLastNameChanged,
                 errorMessage: signUpForm.isFormPosted ?
                     signUpForm.maternalLastName.errorMessage 
@@ -141,9 +137,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 hint: 'correo@ejemplo.com',
                 keyboardType: TextInputType.emailAddress,
                 onChanged: ref.read(signUpFormProvider.notifier).onEmailChange,
-                errorMessage: signUpForm.isFormPosted ?
-                    signUpForm.email.errorMessage 
-                    : null,
+                errorMessage: signUpForm.email.errorMessage ,
               ),
               const SizedBox(height: 16),
               
@@ -156,9 +150,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     hint: '********',
                     obscureText: _obscurePassword,
                     onChanged: ref.read(signUpFormProvider.notifier).onPasswordChanged,
-                    errorMessage: signUpForm.isFormPosted ?
-                        signUpForm.password.errorMessage 
-                        : null,
+                    errorMessage: signUpForm.password.errorMessage ,
                   ),
                   
                   // Botón para mostrar/ocultar contraseña
@@ -197,9 +189,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 hint: 'Ingrese su número de teléfono',
                 keyboardType: TextInputType.phone,
                 onChanged: ref.read(signUpFormProvider.notifier).onPhoneChanged,
-                errorMessage: signUpForm.isFormPosted ?
-                    signUpForm.phone.errorMessage 
-                    : null,
+                errorMessage: signUpForm.phone.errorMessage ,
               ),
               const SizedBox(height: 32),
               
